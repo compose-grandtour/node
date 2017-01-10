@@ -20,7 +20,7 @@ var pg = require('pg');
 var cacert = fs.readFile('./cacert');
 
 // Get your connection string from the Compose deployment overview page
-var connectionString = '[connectionString]';
+var connectionString = process.env.COMPOSEPOSTGRESQLURL;
 
 // We want to parse connectionString to get username, password, database name, server, port
 // So we can use those to connect to the database

@@ -7,8 +7,8 @@ var app = express();
 var elasticsearch=require('elasticsearch');
 var client = new elasticsearch.Client( {
   hosts: [
-    'https://[username]:[password]@[server]:[port]/',
-    'https://[username]:[password]@[server]:[port]/'
+    process.env.COMPOSEELASTICSEARCHURL,
+    process.env.COMPOSEELASTICSEARCHURL2
   ]
 });
 

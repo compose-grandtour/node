@@ -14,7 +14,7 @@ var port = process.env.PORT || 8080;
 var MongoClient = require('mongodb').MongoClient;
 
 // Set up the connection to MongoDB using the connection string from your deployment overview
-var connectionString = '[connectionString]';
+var connectionString = process.env.COMPOSEMONGODBURL;
 var options = {
     mongos: {
         ssl: true,

@@ -19,7 +19,7 @@ var r = require("rethinkdb");
 var parseRethinkdbUrl = require('parse-rethinkdb-url');
 
 // you can get your connection string from the deployment overview page
-var connectionString = '[connectionString]';
+var connectionString = process.env.COMPOSERETHINKDBURL;
 var options = parseRethinkdbUrl(connectionString);
 
 var connection;

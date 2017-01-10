@@ -15,7 +15,7 @@ var redis = require("redis");
 
 // Connect to Redis using a connection string
 // Get your connection string from the Compose deployment overview page
-var connectionString = '[connectionString]';
+var connectionString = process.env.COMPOSEREDISURL;
 var client=redis.createClient(connectionString);
 
 client.on("error", function (err) {
