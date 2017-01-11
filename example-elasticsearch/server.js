@@ -5,11 +5,9 @@ var app = express();
 // Set up the Elasticsearch client connection
 // Alternatively, you could export this from a separate file, eg connections.js
 var elasticsearch=require('elasticsearch');
+var hostList = process.env.COMPOSEELASTICSEARCHURL.split(',');
 var client = new elasticsearch.Client( {
-  hosts: [
-    process.env.COMPOSEELASTICSEARCHURL,
-    process.env.COMPOSEELASTICSEARCHURL2
-  ]
+  hosts: hostList
 });
 
 // use body-parser to handle the PUT data
