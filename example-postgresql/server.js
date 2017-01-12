@@ -17,7 +17,7 @@ var pg = require('pg');
 
 // Get your SSL certificate from the Compose deployment overview page
 // and save it to a file
-var cacert = fs.readFile('./cacert');
+var caCert = fs.readFile('./caCert.pem');
 
 // Get your connection string from the Compose deployment overview page
 var connectionString = process.env.COMPOSEPOSTGRESQLURL;
@@ -30,7 +30,7 @@ config = parse(connectionString);
 // And add the ssl
 config.ssl = {
   rejectUnauthorized: false,
-  ca: cacert
+  ca: caCert
 }
 
 // set up a new client using our config details
