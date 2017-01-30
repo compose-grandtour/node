@@ -1,1 +1,4 @@
 **/node_modules
+/example-mongodb/composecert.pem
+/example-rethinkdb/composecert.pem
+
