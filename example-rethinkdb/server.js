@@ -28,7 +28,7 @@ var connection;
 // and the SSL certificate, and create the 'examples' database.
 // The SSL certificate is available from the deployment overview page
 // If the database already exists RethinkDB returns an error, which will appear in the console
-fs.readFile('./cacert', function(err, caCert) {
+fs.readFile('./composecert.pem', function(err, caCert) {
   // Now we can insert the SSL credentials
   options.ssl = {
       ca: caCert
@@ -45,44 +45,69 @@ fs.readFile('./cacert', function(err, caCert) {
 
 });
 
+// Add a word to the database
+function addWord(request) {
+  return new Promise(function(resolve, reject) {
+    r.db("examples").table("words").insert({
+        "word": request.body.word,
+        "definition": request.body.definition
+    }).run(connection, function(error,cursor) {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(cursor);
+      }
+    });
+  });
+};
 
-
+// Get words from the database
+function getWords() {
+  return new Promise(function(resolve, reject) {
+    // we make a database request for the contents of the 'words' table
+    // ordering the results alphabetically
+    r.db("examples").table("words").orderBy("word").run(connection, function(err, cursor) {
+        if (err) {
+          reject(err);
+        } else {
+          // then we convert the response to an array and send it back to 'main.js'
+          cursor.toArray(function(err, results) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(results);
+            }
+          });
+        }
+    });
+  });
+};
 
 // With the database going to be open as some point in the future, we can
 // now set up our web server. First up we set it to server static pages
 app.use(express.static(__dirname + '/public'));
 
-// When a user clicks 'add' we add their input to the 'words' table
+
+// The user has clicked submit to add a word and definition to the database
+// Send the data to the addWord function and send a response if successful
 app.put("/words", function(request, response) {
-  r.db("examples").table("words").insert({
-      "word": request.body.word,
-      "definition": request.body.definition
-  }).run(connection, function(error,cursor) {
-    if (error) {
-      response.status(500).send(error);
-    } else {
-      response.send("ok");
-    }
-  });
+  addWord(request).then(function(resp) {
+    response.send(resp);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
+    });
 });
 
-// Then we create a route to handle our example database call
+// Read from the database when the page is loaded or after a word is successfully added
+// Use the getWords function to get a list of words and definitions from the database
 app.get("/words", function(request, response) {
-
-    // we make a database request for the contents of the 'words' table
-    // ordering the results alphabetically
-    r.db("examples").table("words").orderBy("word").run(connection, function(err, cursor) {
-
-        if (err) throw err;
-
-        // then we convert the response to an array and send it back to 'main.js'
-        cursor.toArray(function(err, results) {
-          if (err) throw err;
-          response.send(results);
-      });
-
+  getWords().then(function(words) {
+    response.send(words);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
     });
-
 });
 
 // Listen for a connection.

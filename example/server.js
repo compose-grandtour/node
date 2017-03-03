@@ -1,4 +1,5 @@
- // First add the obligatory web framework
+// First add the obligatory web framework
+'use strict';
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -14,18 +15,47 @@ var port = process.env.PORT || 8080;
 app.use(express.static(__dirname + '/public'));
 
 // Create empty object to contain user-added words
-var words = [];
+let words = [];
 
-// Add a word and its definition to the database when the user clicks 'Add'
+// Function to add a word and its definition to the database
+// or in this case, add them to the words object
+function addWord(userInput) {
+  return new Promise(function(resolve, reject) {
+    words.push({
+      'word': userInput.body.word,
+      'definition': userInput.body.definition
+    });
+    resolve("ok");
+  });
+}
+
+// Get a list of words and definitions from the database
+function getWords() {
+  return new Promise(function(resolve, reject) {
+    // normally you'd have a fuction here to get words from the database
+    resolve(words);
+  });
+};
+
+// The user has clicked submit to add a word and definition to the index
+// Send the data to the addWord function and send a response if successful
 app.put("/words", function(request, response) {
-  words.push({'word': request.body.word , 'definition': request.body.definition});
-  response.send('ok');
+  addWord(request).then(function(resp) {
+    response.send(resp);
+  }).catch(function (err) {
+      console.log(err);
+    });
 });
 
-// Get the words and their definitions from the words object
-// when the page loads or a new word has been added
+// Read from the database when the page is loaded or after a word is successfully added
+// Use the getWords function to get a list of words and definitions from the index
 app.get("/words", function(request, response) {
- response.send(words);
+  getWords().then(function(words) {
+    response.send(words);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
+    });
 });
 
 // Listen for a connection.

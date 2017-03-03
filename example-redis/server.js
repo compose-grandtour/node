@@ -22,33 +22,56 @@ client.on("error", function (err) {
     console.log("Error " + err);
 });
 
+// Add a word to the database
+function addWord(request) {
+  return new Promise(function(resolve, reject) {
+    // use the connection to add the word and definition entered by the user
+    client.hset("words", request.body.word, request.body.definition, function(error, result) {
+        if (error) {
+          reject(error);
+        } else {
+          resolve("success");
+        }
+      });
+  });
+};
+
+// Get words from the database
+function getWords() {
+  return new Promise(function(resolve, reject) {
+    // use the connection to return us all the documents in the words hash.
+    client.hgetall("words",function(err, resp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(resp);
+      }
+    });
+  });
+};
+
 // We can now set up our web server. First up we set it to server static pages
 app.use(express.static(__dirname + '/public'));
 
+// The user has clicked submit to add a word and definition to the hash
+// Send the data to the addWord function and send a response if successful
 app.put("/words", function(request, response) {
-
-  // use the connection to add the word and definition entered by the user
-  client.hset("words", request.body.word, request.body.definition, function(error, result) {
-      if (error) {
-        response.status(500).send(error);
-      } else {
-        response.send("success");
-      }
+  addWord(request).then(function(resp) {
+    response.send(resp);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
     });
 });
 
-// Then we create a route to handle our example database call
+// Read from the hash when the page is loaded or after a word is successfully added
+// Use the getWords function to get a list of words and definitions from the hash
 app.get("/words", function(request, response) {
-
-    // and we call on the connection to return us all the documents in the
-    // words hash.
-
-    client.hgetall("words",function(err, resp) {
-      if (err) {
-        response.status(500).send(err);
-      } else {
-        response.send(resp);
-      }
+  getWords().then(function(words) {
+    response.send(words);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
     });
 });
 

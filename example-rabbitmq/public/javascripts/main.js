@@ -12,9 +12,11 @@ $(document).ready(function() {
       url: '/message',
       type: 'PUT',
       data: $(this).serialize(),
-      // success: function(data) {
-      //   reload();
-      // }
+      success: function(data) {
+        rendered = "<li>Message sent: " + data + "</li>";
+        $('#receivedMessages').prepend(rendered);
+        $('.hidden').fadeIn();
+      }
     });
   });
 
@@ -24,8 +26,7 @@ $(document).ready(function() {
       url: '/message',
       type: 'GET',
       success: function(data) {
-        console.log("showing", data);
-        rendered = "<li>Message: " + data + "</li>";
+        rendered = "<li>Message received: " + data + "</li>";
         $('#receivedMessages').prepend(rendered);
         $('.hidden').fadeIn();
       }

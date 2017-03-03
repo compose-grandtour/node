@@ -27,66 +27,111 @@ var parsedurl = url.parse(connectionString);
 // We now name a queue, "hello" - we'll use this queue for communications
 var q = 'hello';
 
-// With the database going to be open as some point in the future, we can
-// now set up our web server. First up we set it to server static pages
-app.use(express.static(__dirname + '/public'));
-
-// Then we create a route to handle our example database call
-app.put("/message", function(request, response) {
+// Add a word to the database
+function addWord(request) {
+  return new Promise(function(resolve, reject) {
     // To send a message, we first open a connection
     amqp.connect(connectionString, { servername: parsedurl.hostname }, function(err, conn) {
-        // With the connection open, we then create a channel
-        conn.createChannel(function(err, ch) {
-            // next we make sure our queue exists
-            ch.assertQueue(q, {
-                durable: false
-            });
-            // We can now send a Buffer as a payload to the queue.
-            ch.sendToQueue(q, new Buffer(request.body.message + ' : Message sent at ' + new Date()));
-            // Here we write our response as plain text confirming that we sent something
-            response.writeHead(200, {
-                "Content-Type": "text/plain"
-            });
-            response.write("Sent 'Hello World!' message");
-            response.end();
-            // Now close the created Channel
-            ch.close();
-            // and set a timer to close the connection so that anything
-            // in transit can clear
-            setTimeout(function() { conn.close(); }, 500);
-        });
+      if (err) {
+        reject(err);
+      }
+      // With the connection open, we then create a channel
+      conn.createChannel(function(err, ch) {
+        if (err) {
+          console.log(err);
+          reject(err);
+        } else {
+          // next we make sure our queue exists
+          ch.assertQueue(q, {
+              durable: false
+          });
+          // We can now send a Buffer as a payload to the queue.
+          msgTxt = request.body.message + ' : Message sent at ' + new Date();
+          ch.sendToQueue(q, new Buffer(msgTxt));    // Now close the created Channel
+          ch.close();
+          // and set a timer to close the connection so that anything
+          // in transit can clear
+          setTimeout(function() { conn.close(); }, 500);
+          resolve(msgTxt);
+        }
+      });
     });
-});
+  });
+};
 
-app.get("/message", function(request, response) {
+// Get words from the database
+function getWords() {
+  return new Promise(function(resolve, reject) {
     // To receive a message, we first open a connection
     amqp.connect(connectionString, { servername: parsedurl.hostname }, function(err, conn) {
+      if (err) {
+        console.log(err);
+        reject(err);
+      } else {
         // With the connection open, we then crea te a channel
         conn.createChannel(function(err, ch) {
+          if (err) {
+            console.log(err);
+            reject(err);
+          } else {
             // next we make sure our queue exists
             ch.assertQueue(q, {
                 durable: false
             });
             // Now we attempt to get a message from our queue
             ch.get(q, {}, function(err, msgOrFalse) {
-
+              if (err) {
+                console.log(err);
+                reject(err);
+              } else {
                 // If the get() call got a message, write the message to
                 // the response and then acknowledge the message so it is
                 // removed from the queue
                 if (msgOrFalse != false) {
-                    response.write(util.inspect(msgOrFalse.content.toString(), false, null));
                     ch.ack(msgOrFalse);
+                    result = util.inspect(msgOrFalse.content.toString(), false, null);
                 } else {
                     // There's nothing, write a message saying that
-                    response.write("Nothing in queue")
+                    result = "Nothing in queue";
                 }
-                // Wrap up the response and close the channel
-                response.end();
+                // close the channel
                 ch.close();
                 // and set a timer to close the connection (there's an ack in transit)
                 setTimeout(function() { conn.close(); }, 500);
+
+                resolve(result);
+              }
             });
+          }
         });
+      }
+    });
+  });
+};
+
+// With the database going to be open as some point in the future, we can
+// now set up our web server. First up we set it to server static pages
+app.use(express.static(__dirname + '/public'));
+
+// The user has clicked submit to add a word and definition to the database
+// Send the data to the addWord function and send a response if successful
+app.put("/message", function(request, response) {
+  addWord(request).then(function(resp) {
+    response.send(resp);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
+    });
+});
+
+// Read from the database when the page is loaded or after a word is successfully added
+// Use the getWords function to get a list of words and definitions from the database
+app.get("/message", function(request, response) {
+  getWords().then(function(words) {
+    response.send(words);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
     });
 });
 

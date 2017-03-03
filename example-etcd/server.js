@@ -33,38 +33,63 @@ var opts = {
 // We can now set up our web server. First up we set it to serve static pages
 app.use(express.static(__dirname + '/public'));
 
-app.put("/words", function(request, response) {
-  // set up a new client using our config details
-  var etcd = new Etcd(hosts, opts);
-  // execute a query on our database
-  etcd.set(request.body.word,request.body.definition,function(err,result) {
-    if (err) {
-      console.log(err.httperror);
-      throw err;
-    }
-    response.send("ok");
+// Add a word to the database
+function addWord(request) {
+  return new Promise(function(resolve, reject) {
+    // set up a new client using our config details
+    var etcd = new Etcd(hosts, opts);
+    // execute a query on our database
+    etcd.set(request.body.word,request.body.definition,function(err,result) {
+      if (err) {
+        reject(err);
+      }
+      else {
+        console.log(result);
+        resolve(result);
+      }
+    });
   });
+};
 
-});
-
-// Read from the database when someone visits /words
-app.get("/words", function(request, response) {
+// Get words from the database
+function getWords() {
+  return new Promise(function(resolve, reject) {
     // set up a new client using our config details
     var etcd = new Etcd(hosts, opts);
     // execute a query on our database
     etcd.get('/', function(err, result) {
       if (err) {
-        console.log(err);
-        response.status(500).send(err);
+        reject(err);
       } else {
-        // get the words from the index
         var words = [];
         result.node.nodes.forEach(function(word){
           words.push( { "word" : word.key , "definition" : word.value  } );
         });
-        console.log(words);
-        response.send(words);
+        resolve(words);
       }
+    });
+  });
+};
+
+// The user has clicked submit to add a word and definition to the database
+// Send the data to the addWord function and send a response if successful
+app.put("/words", function(request, response) {
+  addWord(request).then(function(resp) {
+    response.send(resp);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
+    });
+});
+
+// Read from the database when the page is loaded or after a word is successfully added
+// Use the getWords function to get a list of words and definitions from the database
+app.get("/words", function(request, response) {
+  getWords().then(function(words) {
+    response.send(words);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
     });
 });
 

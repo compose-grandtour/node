@@ -35,37 +35,58 @@ connection.connect(function(err) {
 // We can now set up our web server. First up we set it to serve static pages
 app.use(express.static(__dirname + '/public'));
 
-app.put("/words", function(request, response) {
+// Add a word to the database
+function addWord(request) {
+  return new Promise(function(resolve, reject) {
+    var queryText = 'INSERT INTO words(word,definition) VALUES(?, ?)';
+    connection.query(queryText, [request.body.word,request.body.definition], function (error,result){
+      if (error) {
+        console.log(error);
+        reject(error);
+      } else {
+        console.log(result);
+        resolve(result);
+      }
+    });
+  });
+};
 
-      var queryText = 'INSERT INTO words(word,definition) VALUES(?, ?)';
-
-      connection.query(queryText, [request.body.word,request.body.definition], function (error,result){
-        if (error) {
-          console.log(error);
-          response.status(500).send(error);
-        } else {
-          console.log(result);
-          response.send(result);
-        }
-      });
-
-});
-
-// Read from the database when someone visits /hello
-app.get("/words", function(request, response) {
-
+// Get words from the database
+function getWords() {
+  return new Promise(function(resolve, reject) {
     // execute a query on our database
     connection.query('SELECT * FROM words ORDER BY word ASC', function (err, result) {
       if (err) {
         console.log(err);
-       response.status(500).send(err);
+        reject(err);
       } else {
         console.log(result);
-       response.send(result);
+        resolve(result);
       }
-
     });
+  });
+};
 
+// The user has clicked submit to add a word and definition to the database
+// Send the data to the addWord function and send a response if successful
+app.put("/words", function(request, response) {
+  addWord(request).then(function(resp) {
+    response.send(resp);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
+    });
+});
+
+// Read from the database when the page is loaded or after a word is successfully added
+// Use the getWords function to get a list of words and definitions from the database
+app.get("/words", function(request, response) {
+  getWords().then(function(words) {
+    response.send(words);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
+    });
 });
 
 // Listen for a connection.

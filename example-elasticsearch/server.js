@@ -1,3 +1,4 @@
+'use strict';
 // First add the web framework
 var express = require('express');
 var app = express();
@@ -37,52 +38,78 @@ client.indices.exists({
 // We can now set up our web server. First up we set it to serve static pages
 app.use(express.static(__dirname + '/public'));
 
-// Add a word and its definition to the index using the data passed from the form
-app.put("/words", function(request, response) {
-  var now = new Date();
-  client.index({
-    index: 'examples',
-    type: 'words',
-    body: {
-      "word": request.body.word,
-      "definition": request.body.definition,
-      "added": now
-    }
-  },function(err,resp,status) {
-    if (err) {
-      response.status(500).send(err);
-    } else {
-      response.send(resp);
-    }
+// Add a word to the index
+function addWord(request) {
+  return new Promise(function(resolve, reject) {
+    var now = new Date();
+    client.index({
+      index: 'examples',
+      type: 'words',
+      body: {
+        "word": request.body.word,
+        "definition": request.body.definition,
+        "added": now
+      }
+    },function(err,resp,status) {
+      if (err) {
+        reject(err);
+      } else {
+        console.log(resp);
+        resolve(resp);
+      }
+    });
   });
-});
+};
 
-// Read from the database when the page is loaded or when a word is added
-app.get("/words", function(request, response) {
-  client.search({
-    index: 'examples',
-    type: 'words',
-    _source: ['word','definition'],
-    body: {
-      sort: {
-        'added' : {
-          order: 'desc'
+// Get words from the index
+function getWords() {
+  return new Promise(function(resolve, reject) {
+    client.search({
+      index: 'examples',
+      type: 'words',
+      _source: ['word','definition'],
+      body: {
+        sort: {
+          'added' : {
+            order: 'desc'
+          }
         }
       }
-    }
-  },function (err,resp,status) {
-    if (err) {
-      response.status(500).send(err);
-    } else {
-      // get the words from the index
-      var words = [];
-      resp.hits.hits.forEach(function(hit){
-        words.push( { "word" : hit._source.word , "definition" : hit._source.definition } );
-      });
-      response.send(words);
-    }
+    },function (err,resp,status) {
+      if (err) {
+        reject(err);
+      } else {
+        var words = [];
+        resp.hits.hits.forEach(function(hit){
+          words.push( { "word" : hit._source.word , "definition" : hit._source.definition } );
+        });
+        console.log(words);
+        resolve(words);
+      }
+    });
   });
+};
 
+// The user has clicked submit to add a word and definition to the index
+// Send the data to the addWord function and send a response if successful
+app.put("/words", function(request, response) {
+  addWord(request).then(function(resp) {
+    response.send(resp);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
+    });
+});
+
+// Read from the database when the page is loaded or after a word is successfully added
+// Use the getWords function to get a list of words and definitions from the index
+app.get("/words", function(request, response) {
+  getWords().then(function(words) {
+    response.send(words);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
+    });
 });
 
 // Listen for a connection.

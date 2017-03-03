@@ -47,30 +47,54 @@ MongoClient.connect(connectionString, options,function(err, db) {
 // now set up our web server. First up we set it to server static pages
 app.use(express.static(__dirname + '/public'));
 
-// Add a word and its definition to the database when the user clicks 'Add'
-app.put("/words", function(request, response) {
-  mongodb.collection("words").insertOne( {
-    word: request.body.word, definition: request.body.definition}, function(error, result) {
-      if (error) {
-        response.status(500).send(error);
+// Add a word to the database
+function addWord(request) {
+  return new Promise(function(resolve, reject) {
+    mongodb.collection("words").insertOne( {
+      word: request.body.word, definition: request.body.definition}, function(error, result) {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+  });
+};
+
+// Get words from the database
+function getWords() {
+  return new Promise(function(resolve, reject) {
+    // we call on the connection to return us all the documents in the words collection.
+    mongodb.collection("words").find().toArray(function(err, words) {
+      if (err) {
+       reject(err);
       } else {
-        response.send(result);
+       resolve(words);
       }
+    });
+  });
+};
+
+// The user has clicked submit to add a word and definition to the database
+// Send the data to the addWord function and send a response if successful
+app.put("/words", function(request, response) {
+  addWord(request).then(function(resp) {
+    response.send(resp);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
     });
 });
 
-// Get the words and their definitions from the database
-// when the page loads or a new word has been added
+// Read from the database when the page is loaded or after a word is successfully added
+// Use the getWords function to get a list of words and definitions from the database
 app.get("/words", function(request, response) {
-  // we call on the connection to return us all the documents in the
-  // words collection.
-  mongodb.collection("words").find().toArray(function(err, words) {
-    if (err) {
-     response.status(500).send(err);
-    } else {
-     response.send(words);
-    }
-  });
+  getWords().then(function(words) {
+    response.send(words);
+  }).catch(function (err) {
+      console.log(err);
+      response.status(500).send(err);
+    });
 });
 
 // Listen for a connection.
