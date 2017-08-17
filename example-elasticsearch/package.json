@@ -1,21 +1,21 @@
 {
-	"name": "compose-grandtour-node-elasticsearch",
-	"version": "1.0.0",
-	"dependencies": {
-		"body-parser": "^1.15.2",
-		"express": "4.13.x",
-		"http-post": "^0.1.1",
-		"http-proxy": "^1.8.1",
-		"elasticsearch": "*"
-	},
-	"main": "server.js",
+  "name": "compose-grandtour-node-elasticsearch",
+  "version": "1.0.0",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "elasticsearch": "^13.3.1",
+    "express": "4.13.x",
+    "http-post": "^0.1.1",
+    "http-proxy": "^1.8.1"
+  },
+  "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-	"engines": {
-		"node": "4.x"
-	},
-	"repository": {
+  "engines": {
+    "node": "4.x"
+  },
+  "repository": {
     "type": "git",
     "url": "https://github.com/compose-grandtour/node.git"
   },
