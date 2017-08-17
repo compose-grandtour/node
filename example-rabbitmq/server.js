@@ -33,11 +33,8 @@ function bail(err, conn) {
 let connectionString = process.env.COMPOSERABBITMQURL;
 let parsedurl = url.parse(connectionString);
 
-// We now name a queue, "hello" - we'll use this queue for communications
-// let q = 'hello';
-
-// bind a queue to the exchange to listen for messages
-
+// Bind a queue to the exchange to listen for messages
+// When we publish a message, it will be sent to this queue, via the exchange
 let routingKey = "words";
 let exchangeName = "grandtour";
 let qName = 'sample';
@@ -53,21 +50,20 @@ amqp.connect(connectionString, { servername: parsedurl.hostname }, function(err,
   setTimeout(function() { conn.close(); }, 500);
 });
 
-// Add a word to the database
-function addWord(request) {
+// Add a message to the queue
+function addMessage(request) {
   return new Promise(function(resolve, reject) {
+
     // To send a message, we first open a connection
     amqp.connect(connectionString, { servername: parsedurl.hostname }, function(err, conn) {
-
-      if (err !== null) {
-        console.log(err);
-        return bail(err, conn);
-      }
-
+      if (err !== null) return bail(err, conn);
+      
+      // Then we create a channel
       conn.createChannel(function(err, channel) {
         if (err !== null) return bail(err, conn);
         let message = request.body.message;
-      
+        
+        // And we publish the message to an exchange
         channel.assertExchange(exchangeName, "direct", {
             durable: true
         }, function(err, ok) {
@@ -76,47 +72,51 @@ function addWord(request) {
         });
         
       });
+
       let msgTxt = request.body.message + ' : Message sent at ' + new Date();
       console.log(" [+] %s", msgTxt);
       setTimeout(function() { conn.close(); }, 500);
       resolve(msgTxt);
+
     });
   });
 };
 
-// Get words from the database
-function getWords() {
+// Get a message from the queue
+function getMessage() {
   return new Promise(function(resolve, reject) {
+
     // To receive a message, we first open a connection
     amqp.connect(connectionString, { servername: parsedurl.hostname }, function(err, conn) {
       if (err !== null) return bail(err, conn);
 
-        // With the connection open, we then create a channel
-        conn.createChannel(function(err, channel) {
+      // With the connection open, we then create a channel
+      conn.createChannel(function(err, channel) {
+        if (err !== null) return bail(err, conn);
+
+        // ...and get a message from the queue, which is bound to the exchange
+        channel.get(qName, {}, function(err, msgOrFalse) {
           if (err !== null) return bail(err, conn);
+          
+          let result = "No message received";
 
-            channel.get(qName, {}, function(err, msgOrFalse) {
-              if (err !== null) return bail(err, conn);
-              
-              let result = "No message received";
+          if (msgOrFalse != false) {
+            channel.ack(msgOrFalse);
+            result = msgOrFalse.content.toString() + ' : Message received at ' + new Date();
+            console.log(" [-] %s", result);
+          } else {
+            // There's nothing, write a message saying that
+            result = "No messages in the queue";
+            console.log(" [x] %s", result);
+          }
 
-              if (msgOrFalse != false) {
-                channel.ack(msgOrFalse);
-                result = msgOrFalse.content.toString() + ' : Message received at ' + new Date();
-                console.log(" [-] %s", result);
-              } else {
-                // There's nothing, write a message saying that
-                result = "No messages in the queue";
-                console.log(" [x] %s", result);
-              }
-
-              // close the channel
-              channel.close();
-              // and set a timer to close the connection (there's an ack in transit)
-              setTimeout(function() { conn.close(); }, 500);
-              resolve(result);
-              }, {noAck: true});
-        });
+          // close the channel
+          channel.close();
+          // and set a timer to close the connection (there's an ack in transit)
+          setTimeout(function() { conn.close(); }, 500);
+          resolve(result);
+        }, {noAck: true});
+      });
     });
   });
 };
@@ -128,7 +128,7 @@ app.use(express.static(__dirname + '/public'));
 // The user has clicked submit to add a word and definition to the database
 // Send the data to the addWord function and send a response if successful
 app.put("/message", function(request, response) {
-  addWord(request).then(function(resp) {
+  addMessage(request).then(function(resp) {
     response.send(resp);
   }).catch(function (err) {
       console.log("error:",err);
@@ -139,7 +139,7 @@ app.put("/message", function(request, response) {
 // Read from the database when the page is loaded or after a word is successfully added
 // Use the getWords function to get a list of words and definitions from the database
 app.get("/message", function(request, response) {
-  getWords().then(function(words) {
+  getMessage().then(function(words) {
     response.send(words);
   }).catch(function (err) {
       console.log(err);
