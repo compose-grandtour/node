@@ -1,48 +1,50 @@
-// First add the obligatory web framework
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
+'use strict';
+// Add the express web framework
+const express = require('express');
+const app = express();
 
+// Use body-parser to handle the PUT data
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
   extended: false
 }));
 
 // We want to extract the port to publish our app on
-var port = process.env.PORT || 8080;
+let port = process.env.PORT || 8080;
 
 // Then we'll pull in the database client library
-var cassandra = require('cassandra-driver');
+const cassandra = require('cassandra-driver');
 
 // Use the address translator
-var compose = require('composeaddresstranslator');
+const compose = require('composeaddresstranslator');
 
 // Connect to ScyllaDB using a connection string
 // Get your connection string and mapping details from the Compose deployment overview page.
 // Store the connection string as an environment variable
-var connectionString = process.env.COMPOSESCYLLADBURL;
+let connectionString = process.env.COMPOSESCYLLADBURL;
 
 // your environment variable for the maps should look like:
 // COMPOSESCYLLADBMAPS='{ip:server,ip:server,ip:server}'
 // in other words copy the Address Translation Map from your Compose Deployment Overview
 // including the curly braces
-var mapList = JSON.parse(process.env.COMPOSESCYLLADBMAPS.split(','));
+let mapList = JSON.parse(process.env.COMPOSESCYLLADBMAPS.split(','));
 
 // get a username and password from the uri
 const url = require('url');
-myURL = url.parse(connectionString);
-auth = myURL.auth;
-splitAuth = auth.split(":");
-username = splitAuth[0];
-password = splitAuth[1];
+let myURL = url.parse(connectionString);
+let auth = myURL.auth;
+let splitAuth = auth.split(":");
+let username = splitAuth[0];
+let password = splitAuth[1];
 
 // get contactPoints for the connection
-translator=new compose.ComposeAddressTranslator();
+let translator = new compose.ComposeAddressTranslator();
 translator.setMap(mapList);
 
-var authProvider = new cassandra.auth.PlainTextAuthProvider(username, password)
-var uuid = require('uuid')
+let authProvider = new cassandra.auth.PlainTextAuthProvider(username, password)
+let uuid = require('uuid')
 
-client = new cassandra.Client({
+let client = new cassandra.Client({
   contactPoints: translator.getContactPoints(),
   policies: {
     addressResolution: translator

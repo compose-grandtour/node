@@ -1,31 +1,33 @@
-// First add the obligatory web framework
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var fs = require('fs');
+'use strict';
+// Add the express web framework
+const express = require('express');
+const app = express();
+const fs = require('fs');
 
+// Use body-parser to handle the PUT data
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
   extended: false
 }));
 
 // We want to extract the port to publish our app on
-var port = process.env.PORT || 8080;
+let port = process.env.PORT || 8080;
 
 // Then we'll pull in the database client library
-var pg = require('pg');
+const pg = require('pg');
 
 
 // Get your SSL certificate from the Compose deployment overview page
 // and save it to a file
-var caCert = fs.readFile('./composecert.pem');
+let caCert = fs.readFile('./composecert.pem');
 
 // Get your connection string from the Compose deployment overview page
-var connectionString = process.env.COMPOSEPOSTGRESQLURL;
+let connectionString = process.env.COMPOSEPOSTGRESQLURL;
 
 // We want to parse connectionString to get username, password, database name, server, port
 // So we can use those to connect to the database
-var parse = require('pg-connection-string').parse;
-config = parse(connectionString);
+const parse = require('pg-connection-string').parse;
+let config = parse(connectionString);
 
 // And add the ssl
 config.ssl = {
@@ -34,7 +36,7 @@ config.ssl = {
 }
 
 // set up a new client using our config details
-var client = new pg.Client(config);
+let client = new pg.Client(config);
 
 client.connect(function(err) {
   if (err) {
@@ -51,12 +53,12 @@ client.connect(function(err) {
 // Add a word to the database
 function addWord(request) {
   return new Promise(function(resolve, reject) {
-    var client = new pg.Client(config);
+    let client = new pg.Client(config);
     client.connect(function(err) {
       if (err) {
         reject(err);
       } else {
-        var queryText = 'INSERT INTO words(word,definition) VALUES($1, $2)';
+        let queryText = 'INSERT INTO words(word,definition) VALUES($1, $2)';
         client.query(queryText, [request.body.word,request.body.definition], function (error,result){
           if (error) {
            reject(error);
@@ -72,7 +74,7 @@ function addWord(request) {
 // Get words from the database
 function getWords() {
   return new Promise(function(resolve, reject) {
-    var client = new pg.Client(config);
+    let client = new pg.Client(config);
     client.connect(function(err) {
       if (err) reject(err);
       client.query('SELECT * FROM words ORDER BY word ASC', function (err, result) {

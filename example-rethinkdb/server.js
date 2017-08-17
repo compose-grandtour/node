@@ -1,28 +1,29 @@
-// First add the obligatory web framework
-var express = require('express');
-var app = express();
-var fs = require('fs');
+'use strict';
+// Add the express web framework
+const express = require('express');
+const app = express();
+const fs = require('fs');
 
-var bodyParser = require('body-parser');
-
+// Use body-parser to handle the PUT data
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
   extended: false
 }));
 
 // We want to extract the port to publish our app on
-var port = process.env.PORT || 8080;
+let port = process.env.PORT || 8080;
 
 // Then we'll pull in the database client library
-var r = require("rethinkdb");
+const r = require("rethinkdb");
 
 // We need to parse the connection string for the deployment
-var parseRethinkdbUrl = require('parse-rethinkdb-url');
+let parseRethinkdbUrl = require('parse-rethinkdb-url');
 
 // you can get your connection string from the deployment overview page
-var connectionString = process.env.COMPOSERETHINKDBURL;
-var options = parseRethinkdbUrl(connectionString);
+let connectionString = process.env.COMPOSERETHINKDBURL;
+let options = parseRethinkdbUrl(connectionString);
 
-var connection;
+let connection;
 
 // Make the database connection using the parsed options
 // and the SSL certificate, and create the 'examples' database.

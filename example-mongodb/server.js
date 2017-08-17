@@ -1,29 +1,29 @@
- // First add the obligatory web framework
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
+'use strict';
+// Add the express web framework
+const express = require('express');
+const app = express();
 
+// Use body-parser to handle the PUT data
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
   extended: false
 }));
 
-// We want to extract the port to publish our app on
-var port = process.env.PORT || 8080;
-
 // Then we'll pull in the database client library
-var MongoClient = require('mongodb').MongoClient;
+const MongoClient = require('mongodb').MongoClient;
 
 // Set up the connection to MongoDB using the connection string from your deployment overview
-var connectionString = process.env.COMPOSEMONGODBURL;
-var options = {
-    mongos: {
-        ssl: true,
-        sslValidate: false,
-    }
+let connectionString = process.env.COMPOSEMONGODBURL;
+let options = {
+  ssl: true,
+  sslValidate: false,
 }
 
+// We want to extract the port to publish our app on
+let port = process.env.PORT || 8080;
+
 // This is a global variable we'll use for handing the MongoDB client around
-var mongodb;
+let mongodb;
 
 // This is the MongoDB connection.
 MongoClient.connect(connectionString, options,function(err, db) {
@@ -42,10 +42,6 @@ MongoClient.connect(connectionString, options,function(err, db) {
         }
     }
 );
-
-// With the database going to be open as some point in the future, we can
-// now set up our web server. First up we set it to server static pages
-app.use(express.static(__dirname + '/public'));
 
 // Add a word to the database
 function addWord(request) {
@@ -74,6 +70,10 @@ function getWords() {
     });
   });
 };
+
+// With the database going to be open as some point in the future, we can
+// now set up our web server. First up we set it to server static pages
+app.use(express.static(__dirname + '/public'));
 
 // The user has clicked submit to add a word and definition to the database
 // Send the data to the addWord function and send a response if successful

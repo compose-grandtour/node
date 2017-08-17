@@ -3,12 +3,12 @@
   "description": "MySQL Node.js connection example, part of the Compose grand tour",
   "version": "1.0.0",
   "dependencies": {
-    "body-parser": "^1.15.2",
-      "express": "~4.x",
-      "commander": "^2.6.0",
-      "http-post": "^0.1.1",
-      "http-proxy": "^1.8.1",
-      "mysql": "*"
+    "body-parser": "^1.17.2",
+    "commander": "^2.11.0",
+    "express": "^4.15.4",
+    "http-post": "^0.1.1",
+    "http-proxy": "^1.8.1",
+    "mysql": "^2.14.1"
   },
   "main": "server.js",
   "scripts": {

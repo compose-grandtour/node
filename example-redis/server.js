@@ -1,22 +1,24 @@
-// First add the obligatory web framework
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
+'use strict';
+// Add the express web framework
+const express = require('express');
+const app = express();
 
+// Use body-parser to handle the PUT data
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
   extended: false
 }));
 
 // We want to extract the port to publish our app on
-var port = process.env.PORT || 8080;
+let port = process.env.PORT || 8080;
 
 // Then we'll pull in the database client library
-var redis = require("redis");
+const redis = require("redis");
 
 // Connect to Redis using a connection string
 // Get your connection string from the Compose deployment overview page
-var connectionString = process.env.COMPOSEREDISURL;
-var client=redis.createClient(connectionString);
+let connectionString = process.env.COMPOSEREDISURL;
+let client=redis.createClient(connectionString);
 
 client.on("error", function (err) {
     console.log("Error " + err);

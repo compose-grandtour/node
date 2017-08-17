@@ -24,7 +24,7 @@ let port = process.env.PORT || 8080;
 app.use(express.static(__dirname + '/public'));
 
 // Create the index if it doesn't already exist
-let checkIndices = () => {
+function checkIndices() {
   client.indices.exists({
     index:'examples'
   },function(err,resp,status) {
@@ -44,7 +44,7 @@ let checkIndices = () => {
 checkIndices();
 
 // Add a word to the index
-let addWord = (request) => {
+function addWord(request) {
   return new Promise(function(resolve, reject) {
     let now = new Date();
     client.index({
@@ -67,7 +67,7 @@ let addWord = (request) => {
 };
 
 // Get words from the index
-let getWords = () => {
+function getWords() {
   return new Promise(function(resolve, reject) {
     client.search({
       index: 'examples',

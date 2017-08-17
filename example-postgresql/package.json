@@ -2,13 +2,13 @@
   "name": "compose-grandtour-example-node-postgresql",
   "version": "1.0.0",
   "dependencies": {
-    "body-parser": "^1.15.2",
-    "express": "~4.x",
-    "commander": "^2.6.0",
+    "body-parser": "^1.17.2",
+    "commander": "^2.11.0",
+    "express": "^4.15.4",
     "http-post": "^0.1.1",
     "http-proxy": "^1.8.1",
-    "pg": "*",
-		"pg-connection-string": "*"
+    "pg": "^7.1.2",
+    "pg-connection-string": "*"
   },
   "main": "server.js",
   "scripts": {
@@ -28,5 +28,5 @@
   "bugs": {
     "url": "https://github.com/compose-grandtour/node/issues"
   },
-    "license": "Apache-2.0"
+  "license": "Apache-2.0"
 }

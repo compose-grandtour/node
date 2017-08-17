@@ -1,24 +1,26 @@
-// First add the obligatory web framework
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
+'use strict';
+// Add the express web framework
+const express = require('express');
+const app = express();
 
+// Use body-parser to handle the PUT data
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
   extended: false
 }));
 
 // We want to extract the port to publish our app on
-var port = process.env.PORT || 8080;
+let port = process.env.PORT || 8080;
 
 // Then we'll pull in the database client library
-var mysql = require('mysql');
+const mysql = require('mysql');
 
 // Connect to Redis using a connection string
 // Get your connection string from the Compose deployment overview page
-var connectionString = process.env.COMPOSEMYSQLURL;
+let connectionString = process.env.COMPOSEMYSQLURL;
 
 // set up a new connection using our config details
-var connection = mysql.createConnection(connectionString);
+let connection = mysql.createConnection(connectionString);
 
 connection.connect(function(err) {
   if (err) {
@@ -38,7 +40,7 @@ app.use(express.static(__dirname + '/public'));
 // Add a word to the database
 function addWord(request) {
   return new Promise(function(resolve, reject) {
-    var queryText = 'INSERT INTO words(word,definition) VALUES(?, ?)';
+    let queryText = 'INSERT INTO words(word,definition) VALUES(?, ?)';
     connection.query(queryText, [request.body.word,request.body.definition], function (error,result){
       if (error) {
         console.log(error);

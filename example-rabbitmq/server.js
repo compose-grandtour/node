@@ -1,9 +1,11 @@
-// First add the obligatory web framework
-var express = require('express');
-var app = express();
-var url = require('url');
-var bodyParser = require('body-parser');
+'use strict';
+// Add the express web framework
+const express = require('express');
+const app = express();
+const url = require('url');
 
+// Use body-parser to handle the PUT data
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
   extended: false
 }));
@@ -12,49 +14,72 @@ app.use(bodyParser.urlencoded({
 const util = require('util')
 
 // We want to extract the port to publish our app on
-var port = process.env.PORT || 8080;
+let port = process.env.PORT || 8080;
 
 // Then we'll pull in the database client library
 // Rabbitmq uses AMQP as a protocol, so this is a generic library for the protocol
-var amqp = require("amqplib/callback_api");
+const amqp = require("amqplib/callback_api");
+
+function bail(err, conn) {
+  console.error(err);
+  if (conn) conn.close(function() {
+      process.exit(1);
+  });
+}
 
 // Connect using a connection string
 // Create a user, then get your connection string from the Compose deployment overview page
 // Add your connection string as an environment variable and access it here
-var connectionString = process.env.COMPOSERABBITMQURL;
-var parsedurl = url.parse(connectionString);
+let connectionString = process.env.COMPOSERABBITMQURL;
+let parsedurl = url.parse(connectionString);
 
 // We now name a queue, "hello" - we'll use this queue for communications
-var q = 'hello';
+// let q = 'hello';
+
+// bind a queue to the exchange to listen for messages
+
+let routingKey = "words";
+let exchangeName = "grandtour";
+let qName = 'sample';
+
+amqp.connect(connectionString, { servername: parsedurl.hostname }, function(err, conn) {
+  conn.createChannel(function(err, ch) {
+    ch.assertExchange(exchangeName, 'direct', {durable: true});
+    ch.assertQueue(qName, {exclusive: false}, function(err, q) {
+      console.log(" [*] Waiting for messages in the queue '%s'", q.queue);
+      ch.bindQueue(q.queue, exchangeName, routingKey);
+    });
+  });
+  setTimeout(function() { conn.close(); }, 500);
+});
 
 // Add a word to the database
 function addWord(request) {
   return new Promise(function(resolve, reject) {
     // To send a message, we first open a connection
     amqp.connect(connectionString, { servername: parsedurl.hostname }, function(err, conn) {
-      if (err) {
-        reject(err);
+
+      if (err !== null) {
+        console.log(err);
+        return bail(err, conn);
       }
-      // With the connection open, we then create a channel
-      conn.createChannel(function(err, ch) {
-        if (err) {
-          console.log(err);
-          reject(err);
-        } else {
-          // next we make sure our queue exists
-          ch.assertQueue(q, {
-              durable: false
-          });
-          // We can now send a Buffer as a payload to the queue.
-          msgTxt = request.body.message + ' : Message sent at ' + new Date();
-          ch.sendToQueue(q, new Buffer(msgTxt));    // Now close the created Channel
-          ch.close();
-          // and set a timer to close the connection so that anything
-          // in transit can clear
-          setTimeout(function() { conn.close(); }, 500);
-          resolve(msgTxt);
-        }
+
+      conn.createChannel(function(err, channel) {
+        if (err !== null) return bail(err, conn);
+        let message = request.body.message;
+      
+        channel.assertExchange(exchangeName, "direct", {
+            durable: true
+        }, function(err, ok) {
+            if (err !== null) return bail(err, conn);
+            channel.publish(exchangeName, routingKey, new Buffer(message))
+        });
+        
       });
+      let msgTxt = request.body.message + ' : Message sent at ' + new Date();
+      console.log(" [+] %s", msgTxt);
+      setTimeout(function() { conn.close(); }, 500);
+      resolve(msgTxt);
     });
   });
 };
@@ -64,47 +89,34 @@ function getWords() {
   return new Promise(function(resolve, reject) {
     // To receive a message, we first open a connection
     amqp.connect(connectionString, { servername: parsedurl.hostname }, function(err, conn) {
-      if (err) {
-        console.log(err);
-        reject(err);
-      } else {
-        // With the connection open, we then crea te a channel
-        conn.createChannel(function(err, ch) {
-          if (err) {
-            console.log(err);
-            reject(err);
-          } else {
-            // next we make sure our queue exists
-            ch.assertQueue(q, {
-                durable: false
-            });
-            // Now we attempt to get a message from our queue
-            ch.get(q, {}, function(err, msgOrFalse) {
-              if (err) {
-                console.log(err);
-                reject(err);
-              } else {
-                // If the get() call got a message, write the message to
-                // the response and then acknowledge the message so it is
-                // removed from the queue
-                if (msgOrFalse != false) {
-                    ch.ack(msgOrFalse);
-                    result = util.inspect(msgOrFalse.content.toString(), false, null);
-                } else {
-                    // There's nothing, write a message saying that
-                    result = "Nothing in queue";
-                }
-                // close the channel
-                ch.close();
-                // and set a timer to close the connection (there's an ack in transit)
-                setTimeout(function() { conn.close(); }, 500);
+      if (err !== null) return bail(err, conn);
 
-                resolve(result);
+        // With the connection open, we then create a channel
+        conn.createChannel(function(err, channel) {
+          if (err !== null) return bail(err, conn);
+
+            channel.get(qName, {}, function(err, msgOrFalse) {
+              if (err !== null) return bail(err, conn);
+              
+              let result = "No message received";
+
+              if (msgOrFalse != false) {
+                channel.ack(msgOrFalse);
+                result = msgOrFalse.content.toString() + ' : Message received at ' + new Date();
+                console.log(" [-] %s", result);
+              } else {
+                // There's nothing, write a message saying that
+                result = "No messages in the queue";
+                console.log(" [x] %s", result);
               }
-            });
-          }
+
+              // close the channel
+              channel.close();
+              // and set a timer to close the connection (there's an ack in transit)
+              setTimeout(function() { conn.close(); }, 500);
+              resolve(result);
+              }, {noAck: true});
         });
-      }
     });
   });
 };
@@ -119,7 +131,7 @@ app.put("/message", function(request, response) {
   addWord(request).then(function(resp) {
     response.send(resp);
   }).catch(function (err) {
-      console.log(err);
+      console.log("error:",err);
       response.status(500).send(err);
     });
 });
