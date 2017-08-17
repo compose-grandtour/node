@@ -1,47 +1,52 @@
 'use strict';
-// First add the web framework
-var express = require('express');
-var app = express();
+// Add the express web framework
+const express = require('express');
+const app = express();
 
-// Set up the Elasticsearch client connection
-// Alternatively, you could export this from a separate file, eg connections.js
-var elasticsearch=require('elasticsearch');
-var hostList = process.env.COMPOSEELASTICSEARCHURL.split(',');
-var client = new elasticsearch.Client( {
-  hosts: hostList
-});
-
-// use body-parser to handle the PUT data
-var bodyParser = require('body-parser');
+// Use body-parser to handle the PUT data
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
   extended: false
 }));
 
-// We want to extract the port to publish our app on
-var port = process.env.PORT || 8080;
-
-// Create the index if it doesn't already exist
-client.indices.exists({
-  index:'examples'
-},function(err,resp,status) {
-  if (resp === false) {
-    client.indices.create({
-      index: 'examples'
-    },function(err,resp,status) {
-      if(err) {
-        console.log(err);
-      }
-    });
-  }
+// Set up the Elasticsearch client connection
+// Alternatively, you could export this from a separate file, eg connections.js
+let elasticsearch=require('elasticsearch');
+let hostList = process.env.COMPOSEELASTICSEARCHURL.split(',');
+let client = new elasticsearch.Client( {
+  hosts: hostList
 });
+
+// We want to extract the port to publish our app on
+let port = process.env.PORT || 8080;
 
 // We can now set up our web server. First up we set it to serve static pages
 app.use(express.static(__dirname + '/public'));
 
+// Create the index if it doesn't already exist
+let checkIndices = () => {
+  client.indices.exists({
+    index:'examples'
+  },function(err,resp,status) {
+    if (resp === false) {
+      client.indices.create({
+        index: 'examples'
+      },function(err,resp,status) {
+        if(err) {
+          console.log(err);
+        }
+      });
+    }
+  });
+};
+
+// Check for an existing index
+checkIndices();
+
 // Add a word to the index
-function addWord(request) {
+let addWord = (request) => {
   return new Promise(function(resolve, reject) {
-    var now = new Date();
+    let now = new Date();
     client.index({
       index: 'examples',
       type: 'words',
@@ -62,7 +67,7 @@ function addWord(request) {
 };
 
 // Get words from the index
-function getWords() {
+let getWords = () => {
   return new Promise(function(resolve, reject) {
     client.search({
       index: 'examples',
@@ -79,11 +84,10 @@ function getWords() {
       if (err) {
         reject(err);
       } else {
-        var words = [];
+        let words = [];
         resp.hits.hits.forEach(function(hit){
           words.push( { "word" : hit._source.word , "definition" : hit._source.definition } );
         });
-        console.log(words);
         resolve(words);
       }
     });
