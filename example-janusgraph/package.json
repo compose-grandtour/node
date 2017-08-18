@@ -1,0 +1,34 @@
+{
+  "name": "compose-nd-demo-helloworld-nodejs",
+  "version": "0.0.0",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cf-deployment-tracker-client": "*",
+    "cfenv": "^1.0.4",
+    "commander": "^2.6.0",
+    "curlrequest": "^1.0.1",
+    "express": "~4.x",
+    "http-post": "^0.1.1",
+    "http-proxy": "^1.8.1",
+    "node-fetch": "^1.7.1"
+  },
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IBM-Bluemix/compose-mongodb-helloworld-nodejs.git"
+  },
+  "author": "IBM Corp.",
+  "contributors": [
+    {
+      "name": "Neil Dewhurst",
+      "email": "ndewhurs@uk.ibm.com"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/IBM-Bluemix/compose-mongodb-helloworld-nodejs/issues"
+  },
+  "license": "Apache-2.0"
+}

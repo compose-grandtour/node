@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>IBM Compose sample app</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.1/vis.min.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.1/vis.min.js" type="text/javascript"></script>
+    <script src="/javascripts/main.js" type="text/javascript"></script>
+  </head>
+
+  <body>
+    <div id="intro"><img class = "newappIcon" src="images/logo-graphic-white.png">
+      <h1 id="message">Hello World!</h1>
+      <p class="description"></p> Thanks for creating a <a href=""><span class = "blue">Compose for JanusGraph sample application</span></a>.
+    </div>
+    <div id="query">
+      <h2>Add a word or definition to the database</h2>
+      <form id="add-word">
+        <span>The word </span>
+        <input id="chosenWord" type="text" name="word1" value="hello"/>
+        <select id="edgeType" name="edgeType">
+          <option value="definition" selected>is defined as</option>
+          <option value="follows">is followed by</option>
+        </select>
+        <input id="chosenDef" type="text" name="word2" value="a greeting" />
+        <input type="submit" value="Add" />
+      </form>
+      <h2>View a subgraph for a word</h2>
+      <form id="view-word">
+        <select id="allWords" name="word"></select>
+        <input type="submit" value="View" />
+      </form>
+    </div>
+    <div id="results">
+      <h2>Database output</h2>
+      <div id="messages"></div>
+      <div id="mynetwork"></div>
+    </div>
+  </body>
+
+</html>
