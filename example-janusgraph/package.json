@@ -1,13 +1,11 @@
 {
-  "name": "compose-nd-demo-helloworld-nodejs",
-  "version": "0.0.0",
+  "name": "compose-grandtour-node-example-janusgraph",
+  "description": "JanusGraph Node.js connection example, part of the Compose grand tour",
+  "version": "1.0.0",
   "dependencies": {
-    "body-parser": "^1.15.2",
-    "cf-deployment-tracker-client": "*",
-    "cfenv": "^1.0.4",
-    "commander": "^2.6.0",
+    "body-parser": "^1.17.2",
     "curlrequest": "^1.0.1",
-    "express": "~4.x",
+    "express": "~4.15.4",
     "http-post": "^0.1.1",
     "http-proxy": "^1.8.1",
     "node-fetch": "^1.7.1"
@@ -18,17 +16,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/IBM-Bluemix/compose-mongodb-helloworld-nodejs.git"
+    "url": "https://github.com/compose-grandtour/node.git"
   },
-  "author": "IBM Corp.",
+  "author": "Compose",
   "contributors": [
     {
       "name": "Neil Dewhurst",
-      "email": "ndewhurs@uk.ibm.com"
+      "email": "neil@compose.io"
     }
   ],
   "bugs": {
-    "url": "https://github.com/IBM-Bluemix/compose-mongodb-helloworld-nodejs/issues"
+    "url": "https://github.com/compose-grandtour/node/issues"
   },
   "license": "Apache-2.0"
 }
