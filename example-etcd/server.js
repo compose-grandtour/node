@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({
 const Etcd = require('node-etcd');
 
 // Use your connection string from the deployment overview page
-let connectionString = process.env.COMPOSEETCDURL;
+let connectionString = process.env.COMPOSE_ETCD_URL;
 
 // We need to parse the string to get the various pieces out to pass to Etcd
 let splitter = new RegExp(':|\/|@');

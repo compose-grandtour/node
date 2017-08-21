@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({
 // Set up the Elasticsearch client connection
 // Alternatively, you could export this from a separate file, eg connections.js
 let elasticsearch=require('elasticsearch');
-let hostList = process.env.COMPOSEELASTICSEARCHURL.split(',');
+let hostList = process.env.COMPOSE_ELASTICSEARCH_URL.split(',');
 let client = new elasticsearch.Client( {
   hosts: hostList
 });

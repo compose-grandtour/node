@@ -17,7 +17,7 @@ const mysql = require('mysql');
 
 // Connect to Redis using a connection string
 // Get your connection string from the Compose deployment overview page
-let connectionString = process.env.COMPOSEMYSQLURL;
+let connectionString = process.env.COMPOSE_MYSQL_URL;
 
 // set up a new connection using our config details
 let connection = mysql.createConnection(connectionString);

@@ -16,13 +16,12 @@ let port = process.env.PORT || 8080;
 // Then we'll pull in the database client library
 const pg = require('pg');
 
-
 // Get your SSL certificate from the Compose deployment overview page
 // and save it to a file
-let caCert = fs.readFile('./composecert.pem');
+let caCert = fs.readFile(process.env.PATH_TO_POSTGRESQL_CERT);
 
 // Get your connection string from the Compose deployment overview page
-let connectionString = process.env.COMPOSEPOSTGRESQLURL;
+let connectionString = process.env.COMPOSE_POSTGRESQL_URL;
 
 // We want to parse connectionString to get username, password, database name, server, port
 // So we can use those to connect to the database

@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({
 const MongoClient = require('mongodb').MongoClient;
 
 // Set up the connection to MongoDB using the connection string from your deployment overview
-let connectionString = process.env.COMPOSEMONGODBURL;
+let connectionString = process.env.COMPOSE_MONGODB_URL;
 let options = {
   ssl: true,
   sslValidate: false,

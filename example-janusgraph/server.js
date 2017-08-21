@@ -18,7 +18,13 @@ const assert = require('assert');
 let port = process.env.PORT || 8080;
 
 // Set up the connection to JanusGraph using the connection string from your deployment overview
-let jgurl = process.env.COMPOSEJANUSGRAPHURL;
+let sessionUrl = process.env.COMPOSE_JANUSGRAPH_URL;
+
+// we can parse sessionUrl to get a url to use once we have a token
+let splitter = new RegExp(':|\/|@');
+let parts = sessionUrl.split(splitter);
+let authedUrl = 'https://'+ parts[5] + ':' + parts[6];
+
 
 process.on('unhandledRejection', function (reason, promise) {
     console.log('Unhandled rejection', {reason: reason, promise: promise})
@@ -27,7 +33,7 @@ process.on('unhandledRejection', function (reason, promise) {
 let jgToken;
 let retrying = false;
 
-let authOptions = { url: jgurl, include: true, insecure: true };
+let authOptions = { url: sessionUrl, include: true, insecure: true };
 
 // 1. Get an authorization token
 // 2. (optional) Delete existing graph and Create the example database
@@ -116,7 +122,7 @@ queryTest += 'g.V(query).out(\'definition\').values(\'text\');';
 // Use CURL to pass Gremlin commands to JanusGraph
 function jgQuery(gremlinCommand) {
   let wordsOptions = { 
-    url: jgurl,
+    url: authedUrl,
     headers: { Authorization: 'Token ' + jgToken },
     insecure: true,
     data: '{"gremlin": "' + gremlinCommand + '"}'
@@ -314,35 +320,35 @@ app.put("/words", function(request, response) {
       });
     });
   }).catch(function (err) {
-    console.log("addWord error: %s",err);
+    console.log("[!] addWord error: %s",err);
     response.status(500).send({err});
   });
-});
-
-// Read from the database when the page is loaded or after a word is successfully added
-// Use the getWords function to get a list of words and definitions from the database
-app.get("/words", function(request, response) {
+  });
+  
+  // Read from the database when the page is loaded or after a word is successfully added
+  // Use the getWords function to get a list of words and definitions from the database
+  app.get("/words", function(request, response) {
   console.log("[?] GET request: ",request.query);
   getWords(request).then(function(words) {
     response.send(words);
   }).catch(function (err) {
-      console.log("getWords error:",err);
+      console.log("[!] getWords error:",err);
       response.status(500).send(err);
     });
-});
-
-// Use the listWords function to get a list of words in the database
-app.get("/list", function(request, response) {
+  });
+  
+  // Use the listWords function to get a list of words in the database
+  app.get("/list", function(request, response) {
   console.log("[?] List all words");
    listWords(request).then(function(words) {
     response.send(words);
   }).catch(function (err) {
-      console.log("listWords error:",err);
+      console.log("[!] listWords error:",err);
       response.status(500).send(err);
     });
-});
-
-// Listen for a connection.
-app.listen(port,function(){
+  });
+  
+  // Listen for a connection.
+  app.listen(port,function(){
   console.log('Server is listening on port ' + port);
-});
+  });

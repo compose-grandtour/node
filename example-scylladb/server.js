@@ -21,13 +21,13 @@ const compose = require('composeaddresstranslator');
 // Connect to ScyllaDB using a connection string
 // Get your connection string and mapping details from the Compose deployment overview page.
 // Store the connection string as an environment variable
-let connectionString = process.env.COMPOSESCYLLADBURL;
+let connectionString = process.env.COMPOSE_SCYLLADB_URL;
 
 // your environment variable for the maps should look like:
 // COMPOSESCYLLADBMAPS='{ip:server,ip:server,ip:server}'
 // in other words copy the Address Translation Map from your Compose Deployment Overview
 // including the curly braces
-let mapList = JSON.parse(process.env.COMPOSESCYLLADBMAPS.split(','));
+let mapList = JSON.parse(process.env.COMPOSE_SCYLLADB_MAPS.split(','));
 
 // get a username and password from the uri
 const url = require('url');

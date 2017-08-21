@@ -20,7 +20,7 @@ const r = require("rethinkdb");
 let parseRethinkdbUrl = require('parse-rethinkdb-url');
 
 // you can get your connection string from the deployment overview page
-let connectionString = process.env.COMPOSERETHINKDBURL;
+let connectionString = process.env.COMPOSE_RETHINKDB_URL;
 let options = parseRethinkdbUrl(connectionString);
 
 let connection;
@@ -29,7 +29,7 @@ let connection;
 // and the SSL certificate, and create the 'examples' database.
 // The SSL certificate is available from the deployment overview page
 // If the database already exists RethinkDB returns an error, which will appear in the console
-fs.readFile('./composecert.pem', function(err, caCert) {
+let caCert = fs.readFile(process.env.PATH_TO_RETHINKDB_CERT, function(err, caCert) {
   // Now we can insert the SSL credentials
   options.ssl = {
       ca: caCert
