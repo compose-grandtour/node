@@ -1,5 +1,7 @@
 # Compose Grand Tour - Node.js - etcd
 
+This Compose Grand Tour application shows you how to connect to an etcd deployment using Node.js.
+
 ## Build notes
 
 1. Install Node.js, using Homebrew:
@@ -8,7 +10,7 @@
     brew install node
     ```
 
-2. Install Node modules specified in manifest.yml:
+2. Install Node.js modules specified in manifest.yml:
 
     ```
     npm install
@@ -16,14 +18,14 @@
 
 ## Run notes
 
-The following environment variable needs to be set:
+Set the `COMPOSE_ETCD_URL` environment variable to the Compose connection string for the etcd database. Remember to create a user for etcd and include that user's credentials in the URL.
 
-* `COMPOSE_ETCD_URL` -  set to an HTTPS URL for Etcd
+To run the application:
 
-## Example:
+1. `node server`
+2. Open a browser tab and navigate to `http://localhost:8080`
 
-```
-export COMPOSE_ETCD_URL=https://user:password@portal561-3.node-gt-etcd.rrp.composedb.com:15208/v2/keys
-```
+
+
 
 

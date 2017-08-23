@@ -1,5 +1,7 @@
 # Compose Grand Tour - Node.js - Elasticsearch
 
+This Compose Grand Tour application shows you how to connect to an Elasticsearch deployment using Node.js.
+
 ## Build notes
 
 1. Install Node.js, using Homebrew:
@@ -8,20 +10,19 @@
     brew install node
     ```
 
-2. Install Node modules specified in manifest.yml:
+2. Install Node.js modules specified in manifest.yml:
 
     ```
     npm install
     ```
 
-The following environment variables need to be set:
+## Run notes
 
-* `COMPOSE_ELASTICSEARCH_URL` -  set to a comma delimited list of HTTPS URLs for Elasticsearch
+Set the `COMPOSE_ELASTICSEARCH_URL` environment variable to the Compose connection string for the Elasticsearch database. Remember to create a user for Elasticsearch and include that user's credentials in the URL.
 
-## Example:
+To run the application:
 
-```
-export COMPOSE_ELASTICSEARCH_URL=https://user:password@portal164-7.node-gt-elasticsearch.rrp.composedb.com:15646/,https://user:password@portal851-2.node-gt-elasticsearch.rrp.composedb.com:15646/
-```
+1. `node server`
+2. Open a browser tab and navigate to `http://localhost:8080`
 
 
