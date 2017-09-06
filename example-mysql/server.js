@@ -23,10 +23,10 @@ const mysql = require('mysql');
 let connectionString = process.env.COMPOSE_MYSQL_URL;
 let connectionCertPath = process.env.PATH_TO_MYSQL_CERT;
 
-// Setting nothing in the options will assume no SSL
+// First we need to parse the connection string. Although we could pass
+// the URL directly, that doesn't allow us to set an SSL certificate.
+
 let mysqlurl=new url.URL(connectionString);
-
-
 let options = {
   host:mysqlurl.hostname,
   port:mysqlurl.port,
@@ -43,18 +43,18 @@ if (connectionCertPath) {
   options.flags="--ssl-mode=REQUIRED";
   };
 
-  
 // set up a new connection using our config details
 let connection = mysql.createConnection(options);
 
 connection.connect(function(err) {
-  connection.query("show session status like 'ssl_cipher'",function(err,result) {
-    if(err) {
-      console.log(err);
-    } else {
-      console.log(result);
-    }
-  });
+  // Uncomment the following lines to confirm the connection is TLS encrypted
+  // connection.query("show session status like 'ssl_cipher'",function(err,result) {
+  //   if(err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log(result);
+  //   }
+  // });
   if (err) {
    console.log(err);
   } else {
