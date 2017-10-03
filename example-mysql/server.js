@@ -2,6 +2,9 @@
 // Add the express web framework
 const express = require('express');
 const app = express();
+const fs = require('fs');
+const url = require('url');
+
 
 // Use body-parser to handle the PUT data
 const bodyParser = require('body-parser');
@@ -15,18 +18,47 @@ let port = process.env.PORT || 8080;
 // Then we'll pull in the database client library
 const mysql = require('mysql');
 
-// Connect to Redis using a connection string
+// Connect to MySQL using a connection string
 // Get your connection string from the Compose deployment overview page
 let connectionString = process.env.COMPOSE_MYSQL_URL;
+let connectionCertPath = process.env.PATH_TO_MYSQL_CERT;
+
+// First we need to parse the connection string. Although we could pass
+// the URL directly, that doesn't allow us to set an SSL certificate.
+
+let mysqlurl=new url.URL(connectionString);
+let options = {
+  host:mysqlurl.hostname,
+  port:mysqlurl.port,
+  user:mysqlurl.username,
+  password:mysqlurl.password,
+  database:mysqlurl.pathname.split("/")[1]
+}
+
+// If the path to the certificate is set, we assume SSL.
+// Therefore we read the cert and set the options for a validated SSL connection
+if (connectionCertPath) {
+  var ca = [fs.readFileSync(connectionCertPath)];
+  options.ssl={ ca: ca };
+  options.flags="--ssl-mode=REQUIRED";
+  };
 
 // set up a new connection using our config details
-let connection = mysql.createConnection(connectionString);
+let connection = mysql.createConnection(options);
 
 connection.connect(function(err) {
+  // Uncomment the following lines to confirm the connection is TLS encrypted
+  // connection.query("show session status like 'ssl_cipher'",function(err,result) {
+  //   if(err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log(result);
+  //   }
+  // });
   if (err) {
    console.log(err);
   } else {
-    connection.query('CREATE TABLE words (id int auto_increment primary key, word varchar(256) NOT NULL, definition varchar(256) NOT NULL)', function (err,result){
+    connection.query('CREATE TABLE IF NOT EXISTS words (id int auto_increment primary key, word varchar(256) NOT NULL, definition varchar(256) NOT NULL)', function (err,result){
       if (err) {
         console.log(err)
       }
@@ -62,7 +94,6 @@ function getWords() {
         console.log(err);
         reject(err);
       } else {
-        console.log(result);
         resolve(result);
       }
     });
