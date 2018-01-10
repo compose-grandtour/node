@@ -11,9 +11,9 @@ app.use(bodyParser.urlencoded({
 
 // Set up the Elasticsearch client connection
 // Alternatively, you could export this from a separate file, eg connections.js
-let elasticsearch=require('elasticsearch');
+let elasticsearch = require('elasticsearch');
 let hostList = process.env.COMPOSE_ELASTICSEARCH_URL.split(',');
-let client = new elasticsearch.Client( {
+let client = new elasticsearch.Client({
   hosts: hostList
 });
 
@@ -26,13 +26,24 @@ app.use(express.static(__dirname + '/public'));
 // Create the index if it doesn't already exist
 function checkIndices() {
   client.indices.exists({
-    index:'examples'
-  },function(err,resp,status) {
+    index: 'examples'
+  }, function (err, resp, status) {
     if (resp === false) {
       client.indices.create({
-        index: 'examples'
-      },function(err,resp,status) {
-        if(err) {
+        index: 'examples',
+        body: {
+          mappings: {
+            "words": {
+              "properties": {
+                "word": { "type": "text" },
+                "definition": { "type": "text" },
+                "added": { "type": "date" }
+              }
+            }
+          }
+        }
+      }, function (err, resp, status) {
+        if (err) {
           console.log(err);
         }
       });
@@ -45,7 +56,7 @@ checkIndices();
 
 // Add a word to the index
 function addWord(request) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     let now = new Date();
     client.index({
       index: 'examples',
@@ -54,12 +65,12 @@ function addWord(request) {
         "word": request.body.word,
         "definition": request.body.definition,
         "added": now
-      }
-    },function(err,resp,status) {
+      },
+      refresh: "wait_for"
+    }, function (err, resp, status) {
       if (err) {
         reject(err);
       } else {
-        console.log(resp);
         resolve(resp);
       }
     });
@@ -68,25 +79,25 @@ function addWord(request) {
 
 // Get words from the index
 function getWords() {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     client.search({
       index: 'examples',
       type: 'words',
-      _source: ['word','definition'],
+      _source: ['word', 'definition'],
       body: {
         sort: {
-          'added' : {
+          'added': {
             order: 'desc'
           }
         }
       }
-    },function (err,resp,status) {
+    }, function (err, resp, status) {
       if (err) {
         reject(err);
       } else {
         let words = [];
-        resp.hits.hits.forEach(function(hit){
-          words.push( { "word" : hit._source.word , "definition" : hit._source.definition } );
+        resp.hits.hits.forEach(function (hit) {
+          words.push({ "word": hit._source.word, "definition": hit._source.definition });
         });
         resolve(words);
       }
@@ -96,27 +107,27 @@ function getWords() {
 
 // The user has clicked submit to add a word and definition to the index
 // Send the data to the addWord function and send a response if successful
-app.put("/words", function(request, response) {
-  addWord(request).then(function(resp) {
+app.put("/words", function (request, response) {
+  addWord(request).then(function (resp) {
     response.send(resp);
   }).catch(function (err) {
-      console.log(err);
-      response.status(500).send(err);
-    });
+    console.log(err);
+    response.status(500).send(err);
+  });
 });
 
 // Read from the database when the page is loaded or after a word is successfully added
 // Use the getWords function to get a list of words and definitions from the index
-app.get("/words", function(request, response) {
-  getWords().then(function(words) {
+app.get("/words", function (request, response) {
+  getWords().then(function (words) {
     response.send(words);
   }).catch(function (err) {
-      console.log(err);
-      response.status(500).send(err);
-    });
+    console.log(err);
+    response.status(500).send(err);
+  });
 });
 
 // Listen for a connection.
-app.listen(port,function(){
+app.listen(port, function () {
   console.log('Server is listening on port ' + port);
 });
