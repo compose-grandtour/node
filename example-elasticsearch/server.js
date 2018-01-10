@@ -26,11 +26,11 @@ app.use(express.static(__dirname + '/public'));
 // Create the index if it doesn't already exist
 function checkIndices() {
   client.indices.exists({
-    index: 'examples'
+    index: 'grand_tour'
   }, function (err, resp, status) {
     if (resp === false) {
       client.indices.create({
-        index: 'examples',
+        index: 'grand_tour',
         body: {
           mappings: {
             "words": {
@@ -59,7 +59,7 @@ function addWord(request) {
   return new Promise(function (resolve, reject) {
     let now = new Date();
     client.index({
-      index: 'examples',
+      index: 'grand_tour',
       type: 'words',
       body: {
         "word": request.body.word,
@@ -81,7 +81,7 @@ function addWord(request) {
 function getWords() {
   return new Promise(function (resolve, reject) {
     client.search({
-      index: 'examples',
+      index: 'grand_tour',
       type: 'words',
       _source: ['word', 'definition'],
       body: {
