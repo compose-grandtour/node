@@ -83,7 +83,6 @@ function addWord(request) {
         console.log(error);
         reject(error);
       } else {
-        console.log(result);
         resolve(result);
       }
     });
