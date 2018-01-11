@@ -23,6 +23,11 @@ const mysql = require('mysql');
 let connectionString = process.env.COMPOSE_MYSQL_URL;
 let connectionCertPath = process.env.PATH_TO_MYSQL_CERT;
 
+if (connectionString===undefined) {
+  console.error("Please set the COMPOSE_MYSQL_URL environment variable")
+  process.exit(1);
+}
+
 // First we need to parse the connection string. Although we could pass
 // the URL directly, that doesn't allow us to set an SSL certificate.
 
