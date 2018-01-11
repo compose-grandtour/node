@@ -2,12 +2,12 @@
   "name": "example-mongodb",
   "version": "1.0.0",
   "dependencies": {
-    "body-parser": "^1.17.2",
-    "commander": "^2.11.0",
-    "express": "^4.15.4",
+    "body-parser": "^1.18.2",
+    "commander": "^2.13.0",
+    "express": "^4.16.2",
     "http-post": "^0.1.1",
     "http-proxy": "^1.8.1",
-    "mongodb": "^2.2.31"
+    "mongodb": "^2.2.34"
   },
   "main": "server.js",
   "scripts": {
