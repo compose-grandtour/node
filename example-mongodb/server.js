@@ -17,6 +17,10 @@ const MongoClient = require('mongodb').MongoClient;
 let connectionString = process.env.COMPOSE_MONGODB_URL;
 let connectionCertPath = process.env.PATH_TO_MONGODB_CERT;
 
+if (connectionString===undefined) {
+  console.error("Please set the COMPOSE_MONGODB_URL environment variable")
+  process.exit(1);
+}
 // Setting nothing in the options will assume no SSL
 let options = {}
 
@@ -46,11 +50,12 @@ MongoClient.connect(connectionString, options, function (err, db) {
   if (err) {
     console.log(err);
   } else {
-    // Although we have a connection, it's to the "admin" database
-    // of MongoDB deployment. In this example, we want the
-    // "examples" database so what we do here is create that
-    // connection using the current connection.
-    mongodb = db.db("examples");
+    // Although we have a connection, it may be to the "admin" 
+    // database of MongoDB deployment, depending on the connection
+    // string. So, in this example we make sure we use the
+    // "grand_tour" database by pointing the mongodb variable to
+    // that particular database.
+    mongodb = db.db("grand_tour");
   }
 }
 );
