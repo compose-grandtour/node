@@ -22,7 +22,7 @@ const pg = require("pg");
 let connectionString = process.env.COMPOSE_POSTGRESQL_URL;
 
 if (connectionString === undefined) {
-  console.error("Please set the COMPOSE_MYSQL_URL environment variable");
+  console.error("Please set the COMPOSE_POSTGRESQL_URL environment variable");
   process.exit(1);
 }
 
