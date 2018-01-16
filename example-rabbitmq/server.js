@@ -31,6 +31,12 @@ function bail(err, conn) {
 // Create a user, then get your connection string from the Compose deployment overview page
 // Add your connection string as an environment variable and access it here
 let connectionString = process.env.COMPOSE_RABBITMQ_URL;
+
+if (connectionString===undefined) {
+  console.error("Please set the COMPOSE_RABBITMQ_URL environment variable")
+  process.exit(1);
+}
+
 let parsedurl = url.parse(connectionString);
 
 // Bind a queue to the exchange to listen for messages
