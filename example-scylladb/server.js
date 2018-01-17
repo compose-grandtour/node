@@ -38,7 +38,7 @@ let auth = myURL.auth;
 let splitAuth = auth.split(":");
 let username = splitAuth[0];
 let password = splitAuth[1];
-let sslopts = myURL.protocol==="https:"? {} : null;
+let sslopts = myURL.protocol === "https:" ? {} : null;
 
 // get contactPoints for the connection
 let translator = new compose.ComposeAddressTranslator();
@@ -123,29 +123,22 @@ app.get("/words", function(request, response) {
 console.log("Connecting");
 
 // create a keyspace and a table if they don't already exist
-client.execute(
-  "CREATE KEYSPACE IF NOT EXISTS examples WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '3' };",
-  function(error, result) {
-    if (error) {
-      console.log(error);
-      process.exit(1);
-    } else {
-      console.log("Connected");
-      client.execute(
-        "CREATE TABLE IF NOT EXISTS examples.words (my_table_id uuid, word text, definition text, PRIMARY KEY(my_table_id));",
-        function(err, res) {
-          if (err) {
-            console.log(err);
-            process.exit(1);
-          } else {
-            console.log("Ready");
-            // Listen for a connection.
-            app.listen(port, function() {
-              console.log("Server is listening on port " + port);
-            });
-          }
-        }
-      );
-    }
-  }
-);
+client
+  .execute(
+    "CREATE KEYSPACE IF NOT EXISTS examples WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '3' };"
+  )
+  .then(result =>
+    client
+      .execute(
+        "CREATE TABLE IF NOT EXISTS examples.words (my_table_id uuid, word text, definition text, PRIMARY KEY(my_table_id));"
+      )
+      .then(result => {
+        app.listen(port, function() {
+          console.log("Server is listening on port " + port);
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        process.exit(1);
+      })
+  );
