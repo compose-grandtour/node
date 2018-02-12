@@ -1,0 +1,31 @@
+{
+  "name": "compose-grandtour-node-example-etcd",
+  "description": "Etcd Node.js connection example, part of the Compose grand tour",
+  "version": "1.0.0",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "etcd3": "^0.2.6",
+    "express": "^4.15.4",
+    "http-post": "^0.1.1",
+    "http-proxy": "^1.8.1"
+  },
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/compose-grandtour/node.git"
+  },
+  "author": "Compose",
+  "contributors": [
+    {
+      "name": "Neil Dewhurst",
+      "email": "neil@compose.io"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/compose-grandtour/node/issues"
+  },
+  "license": "Apache-2.0"
+}
