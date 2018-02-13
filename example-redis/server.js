@@ -1,4 +1,6 @@
 "use strict";
+/* jshint node:true */
+
 // Add the express web framework
 const express = require("express");
 const { URL } = require("url");

@@ -1,4 +1,6 @@
 'use strict';
+/* jshint node:true */
+
 // Add the express web framework
 const express = require('express');
 const app = express();
@@ -27,7 +29,7 @@ let auth = {
 // Create auth credentials
 let opts = {
     auth: auth
-}
+};
 
 // We want to extract the port to publish our app on
 let port = process.env.PORT || 8080;
@@ -48,7 +50,7 @@ function addWord(request) {
       }
     });
   });
-};
+}
 
 // Get words from the database
 function getWords() {
@@ -68,7 +70,7 @@ function getWords() {
       }
     });
   });
-};
+}
 
 // We can now set up our web server. First up we set it to serve static pages
 app.use(express.static(__dirname + '/public'));

@@ -1,4 +1,6 @@
-'use strict';
+"use strict";
+/* jshint node:true */
+
 // Add the express web framework
 const express = require('express');
 const fs = require('fs');
@@ -18,11 +20,11 @@ let connectionString = process.env.COMPOSE_MONGODB_URL;
 let connectionCertPath = process.env.PATH_TO_MONGODB_CERT;
 
 if (connectionString===undefined) {
-  console.error("Please set the COMPOSE_MONGODB_URL environment variable")
+  console.error("Please set the COMPOSE_MONGODB_URL environment variable");
   process.exit(1);
 }
 // Setting nothing in the options will assume no SSL
-let options = {}
+let options = {};
 
 // If the path to the certificate is set, we assume SSL.
 // Therefore we read the cert and set the options for a validated SSL connection
@@ -73,7 +75,7 @@ function addWord(request) {
       }
     });
   });
-};
+}
 
 // Get words from the database
 function getWords() {
@@ -87,7 +89,7 @@ function getWords() {
       }
     });
   });
-};
+}
 
 // With the database going to be open as some point in the future, we can
 // now set up our web server. First up we set it to server static pages

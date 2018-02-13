@@ -1,4 +1,6 @@
-'use strict';
+"use strict";
+/* jshint node:true */
+
 // Add the express web framework
 const express = require('express');
 const app = express();
@@ -11,7 +13,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 // Util is handy to have around, so thats why that's here.
-const util = require('util')
+const util = require('util');
 
 // We want to extract the port to publish our app on
 let port = process.env.PORT || 8080;
@@ -33,7 +35,7 @@ function bail(err, conn) {
 let connectionString = process.env.COMPOSE_RABBITMQ_URL;
 
 if (connectionString===undefined) {
-  console.error("Please set the COMPOSE_RABBITMQ_URL environment variable")
+  console.error("Please set the COMPOSE_RABBITMQ_URL environment variable");
   process.exit(1);
 }
 
@@ -74,7 +76,7 @@ function addMessage(request) {
             durable: true
         }, function(err, ok) {
             if (err !== null) return bail(err, conn);
-            channel.publish(exchangeName, routingKey, new Buffer(message))
+            channel.publish(exchangeName, routingKey, new Buffer(message));
         });
         
       });
@@ -86,7 +88,7 @@ function addMessage(request) {
 
     });
   });
-};
+}
 
 // Get a message from the queue
 function getMessage() {
@@ -125,7 +127,7 @@ function getMessage() {
       });
     });
   });
-};
+}
 
 // With the database going to be open as some point in the future, we can
 // now set up our web server. First up we set it to server static pages

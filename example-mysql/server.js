@@ -1,4 +1,6 @@
-'use strict';
+"use strict";
+/* jshint node:true */
+
 // Add the express web framework
 const express = require('express');
 const app = express();
@@ -24,7 +26,7 @@ let connectionString = process.env.COMPOSE_MYSQL_URL;
 let connectionCertPath = process.env.PATH_TO_MYSQL_CERT;
 
 if (connectionString===undefined) {
-  console.error("Please set the COMPOSE_MYSQL_URL environment variable")
+  console.error("Please set the COMPOSE_MYSQL_URL environment variable");
   process.exit(1);
 }
 
@@ -38,7 +40,7 @@ let options = {
   user:mysqlurl.username,
   password:mysqlurl.password,
   database:mysqlurl.pathname.split("/")[1]
-}
+};
 
 // If the path to the certificate is set, we assume SSL.
 // Therefore we read the cert and set the options for a validated SSL connection
@@ -46,7 +48,7 @@ if (connectionCertPath) {
   var ca = [fs.readFileSync(connectionCertPath)];
   options.ssl={ ca: ca };
   options.flags="--ssl-mode=REQUIRED";
-  };
+  }
 
 // set up a new connection using our config details
 let connection = mysql.createConnection(options);
@@ -65,7 +67,7 @@ connection.connect(function(err) {
   } else {
     connection.query('CREATE TABLE IF NOT EXISTS words (id int auto_increment primary key, word varchar(256) NOT NULL, definition varchar(256) NOT NULL)', function (err,result){
       if (err) {
-        console.log(err)
+        console.log(err);
       }
     });
   }
@@ -87,7 +89,7 @@ function addWord(request) {
       }
     });
   });
-};
+}
 
 // Get words from the database
 function getWords() {
@@ -102,7 +104,7 @@ function getWords() {
       }
     });
   });
-};
+}
 
 // The user has clicked submit to add a word and definition to the database
 // Send the data to the addWord function and send a response if successful

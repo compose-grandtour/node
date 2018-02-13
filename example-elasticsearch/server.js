@@ -1,4 +1,6 @@
 'use strict';
+/* jshint node:true */
+
 // Add the express web framework
 const express = require('express');
 const app = express();
@@ -49,7 +51,7 @@ function checkIndices() {
       });
     }
   });
-};
+}
 
 // Check for an existing index
 checkIndices();
@@ -75,7 +77,7 @@ function addWord(request) {
       }
     });
   });
-};
+}
 
 // Get words from the index
 function getWords() {
@@ -103,7 +105,7 @@ function getWords() {
       }
     });
   });
-};
+}
 
 // The user has clicked submit to add a word and definition to the index
 // Send the data to the addWord function and send a response if successful

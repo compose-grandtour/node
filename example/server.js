@@ -1,5 +1,7 @@
-// First add the obligatory web framework
 'use strict';
+/* jshint node:true */
+
+// First add the obligatory web framework
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -35,7 +37,7 @@ function getWords() {
     // normally you'd have a fuction here to get words from the database
     resolve(words);
   });
-};
+}
 
 // The user has clicked submit to add a word and definition to the index
 // Send the data to the addWord function and send a response if successful

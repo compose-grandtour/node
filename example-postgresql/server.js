@@ -1,4 +1,6 @@
 "use strict";
+/* jshint node:true */
+
 // Add the express web framework
 const express = require("express");
 const app = express();
@@ -46,7 +48,8 @@ let client = new pg.Client(config);
 
 client.connect(function(err) {
   if (err) {
-    response.status(500).send(err);
+    console.log(err);
+    process.exit(1);
   } else {
     client.query(
       "CREATE TABLE IF NOT EXISTS words (word varchar(256) NOT NULL, definition varchar(256) NOT NULL)",

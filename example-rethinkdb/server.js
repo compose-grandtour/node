@@ -1,4 +1,6 @@
-'use strict';
+"use strict";
+/* jshint node:true */
+
 // Add the express web framework
 const express = require('express');
 const app = express();
@@ -60,7 +62,7 @@ function addWord(request) {
       }
     });
   });
-};
+}
 
 // Get words from the database
 function getWords() {
@@ -82,7 +84,7 @@ function getWords() {
         }
     });
   });
-};
+}
 
 // With the database going to be open as some point in the future, we can
 // now set up our web server. First up we set it to server static pages
