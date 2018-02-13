@@ -26,7 +26,7 @@ There are three environment variables to set:
 
 This is a comma delimited list of endpoints available to the application. It is shown as the **Connection String** in the Comopose Console in this format:
 
-```
+```text
 https://[username]:[password]@portal1324-25.dazzling-etcd-63.compose-3.composedb.com:23930
 https://[username]:[password]@portal2349-4.dazzling-etcd-63.compose-3.composedb.com:23930
 ```
@@ -34,7 +34,6 @@ https://[username]:[password]@portal2349-4.dazzling-etcd-63.compose-3.composedb.
 This would become
 
 `COMPOSE_ETCD_ENDPOINTS=https://portal1324-25.dazzling-etcd-63.compose-3.composedb.com:23930,https://@portal2349-4.dazzling-etcd-63.compose-3.composedb.com:23930`
-
 
 ### COMPOSE_ETCD_USER
 
