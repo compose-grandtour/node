@@ -1,6 +1,6 @@
 {
-  "name": "compose-grandtour-node-example-etcd",
-  "description": "Etcd Node.js connection example, part of the Compose grand tour",
+  "name": "compose-grandtour-node-example-etcd3",
+  "description": "Etcd3 Node.js connection example, part of the Compose grand tour",
   "version": "1.0.0",
   "dependencies": {
     "body-parser": "^1.17.2",
