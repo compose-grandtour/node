@@ -25,6 +25,7 @@ if (connectionString === undefined) {
   console.error("Please set the COMPOSE_MONGODB_URL environment variable");
   process.exit(1);
 }
+
 // Setting nothing in the options will assume no SSL
 let options = {};
 
