@@ -16,6 +16,12 @@ app.use(bodyParser.urlencoded({
 const { Etcd3 } = require('etcd3');
 
 let endpoints = process.env.COMPOSE_ETCD_ENDPOINTS;
+
+if (endpoints === undefined) {
+  console.error("Please set the COMPOSE_ETCD_ENDPOINTS environment variable");
+  process.exit(1);
+}
+
 let envuser = process.env.COMPOSE_ETCD_USER;
 let envpass = process.env.COMPOSE_ETCD_PASS;
 

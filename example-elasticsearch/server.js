@@ -14,7 +14,15 @@ app.use(bodyParser.urlencoded({
 // Set up the Elasticsearch client connection
 // Alternatively, you could export this from a separate file, eg connections.js
 let elasticsearch = require('elasticsearch');
-let hostList = process.env.COMPOSE_ELASTICSEARCH_URL.split(',');
+
+let connectionString=process.env.COMPOSE_ELASTICSEARCH_URL;
+
+if (connectionString === undefined) {
+  console.error("Please set the COMPOSE_ELASTICSEARCH_URL environment variable");
+  process.exit(1);
+}
+let hostList = connectionString.split(',');
+
 let client = new elasticsearch.Client({
   hosts: hostList
 });

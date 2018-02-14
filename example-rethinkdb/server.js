@@ -25,6 +25,12 @@ let parseRethinkdbUrl = require("parse-rethinkdb-url");
 
 // you can get your connection string from the deployment overview page
 let connectionString = process.env.COMPOSE_RETHINKDB_URL;
+
+if (connectionString === undefined) {
+  console.error("Please set the COMPOSE_RETHINKDB_URL environment variable");
+  process.exit(1);
+}
+
 let options = parseRethinkdbUrl(connectionString);
 
 let connection;

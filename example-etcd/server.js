@@ -19,6 +19,10 @@ const Etcd = require("node-etcd");
 // Use your connection string from the deployment overview page
 let connectionString = process.env.COMPOSE_ETCD_URL;
 
+if (connectionString === undefined) {
+  console.error("Please set the COMPOSE_ETCD_URL environment variable");
+  process.exit(1);
+}
 // We need to parse the string to get the various pieces out to pass to Etcd
 let splitter = new RegExp(":|/|@");
 let parts = connectionString.split(splitter);
