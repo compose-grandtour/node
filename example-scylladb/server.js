@@ -27,6 +27,11 @@ const compose = require("composeaddresstranslator");
 // Store the connection string as an environment variable
 let connectionString = process.env.COMPOSE_SCYLLA_URLS;
 
+if (connectionString === undefined) {
+  console.error("Please set the COMPOSE_SCYLLA_URLS environment variable");
+  process.exit(1);
+}
+
 // your environment variable for the maps should look like:
 // COMPOSESCYLLADBMAPS='{ip:server,ip:server,ip:server}'
 // in other words copy the Address Translation Map from your Compose Deployment Overview
@@ -62,7 +67,7 @@ let client = new cassandra.Client({
 function addWord(request) {
   return new Promise(function(resolve, reject) {
     client.execute(
-      "INSERT INTO examples.words(my_table_id, word, definition) VALUES(?,?,?)",
+      "INSERT INTO grand_tour.words(my_table_id, word, definition) VALUES(?,?,?)",
       [uuid.v4(), request.body.word, request.body.definition],
       { prepare: true },
       function(error, result) {
@@ -81,7 +86,7 @@ function addWord(request) {
 function getWords() {
   return new Promise(function(resolve, reject) {
     // execute a query on our database
-    client.execute("SELECT * FROM examples.words", function(err, result) {
+    client.execute("SELECT * FROM grand_tour.words", function(err, result) {
       if (err) {
         console.log(err);
         reject(err);
@@ -127,12 +132,12 @@ console.log("Connecting");
 // create a keyspace and a table if they don't already exist
 client
   .execute(
-    "CREATE KEYSPACE IF NOT EXISTS examples WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '3' };"
+    "CREATE KEYSPACE IF NOT EXISTS grand_tour WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '3' };"
   )
   .then(result =>
     client
       .execute(
-        "CREATE TABLE IF NOT EXISTS examples.words (my_table_id uuid, word text, definition text, PRIMARY KEY(my_table_id));"
+        "CREATE TABLE IF NOT EXISTS grand_tour.words (my_table_id uuid, word text, definition text, PRIMARY KEY(my_table_id));"
       )
       .then(result => {
         app.listen(port, function() {
