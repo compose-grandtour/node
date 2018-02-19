@@ -31,9 +31,9 @@ https://[username]:[password]@portal1324-25.dazzling-etcd-63.compose-3.composedb
 https://[username]:[password]@portal2349-4.dazzling-etcd-63.compose-3.composedb.com:23930
 ```
 
-This would become
+For the environment variable, you remove the username and password details, and include both entries in a single line, separated by a comma, so it becomes:
 
-`COMPOSE_ETCD_ENDPOINTS=https://portal1324-25.dazzling-etcd-63.compose-3.composedb.com:23930,https://@portal2349-4.dazzling-etcd-63.compose-3.composedb.com:23930`
+`COMPOSE_ETCD_ENDPOINTS=https://portal1324-25.dazzling-etcd-63.compose-3.composedb.com:23930,https://portal2349-4.dazzling-etcd-63.compose-3.composedb.com:23930`
 
 ### COMPOSE_ETCD_USER
 
