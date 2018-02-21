@@ -67,11 +67,6 @@ r.connect(options).then(function(conn) {
     console.err(err);
 });
 
-
-
-
-
-
 // Add a word to the database
 function addWord(word, definition) {
     return new Promise(function(resolve, reject) {
