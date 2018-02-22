@@ -1,15 +1,16 @@
 {
-    "name": "compose-grandtour-example-node-postgresql",
-    "description": "PostgreSQL Node.js connection example, part of the Compose grand tour",
+    "name": "compose-grandtour-node-example-scylladb",
+    "description": "Scylla Node.js connection example, part of the Compose grand tour",
     "version": "1.0.0",
     "dependencies": {
         "body-parser": "^1.17.2",
+        "cassandra-driver": "^3.2.2",
         "commander": "^2.11.0",
+        "composeaddresstranslator": "^1.0.3",
         "express": "^4.15.4",
         "http-post": "^0.1.1",
         "http-proxy": "^1.8.1",
-        "pg": "^7.1.2",
-        "pg-connection-string": "^0.1.3"
+        "uuid": "^3.1.0"
     },
     "main": "server.js",
     "scripts": {

@@ -6,13 +6,13 @@ This Compose Grand Tour application shows you how to connect to a Redis deployme
 
 1. Install Node.js, using Homebrew:
 
-    ```
+    ```shell
     brew install node
     ```
 
-2. Install Node.js modules specified in manifest.yml:
+2. Install Node.js modules specified in package.json:
 
-    ```
+    ```shell
     npm install
     ```
 
