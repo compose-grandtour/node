@@ -24,7 +24,9 @@ const compose = require("composeaddresstranslator");
 
 // Connect to Scylla using a connection string
 // Get your connection string and mapping details from the Compose deployment overview page.
-// Store the connection string as an environment variable
+// Store the connection string and mapping details as environment variables
+// For the connection string it should look like:
+// COMPOSE_SCYLLA_URLS='connectionString1,connectionString2,connectionString3'
 let connectionString = process.env.COMPOSE_SCYLLA_URLS;
 
 if (connectionString === undefined) {
