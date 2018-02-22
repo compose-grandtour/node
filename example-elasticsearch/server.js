@@ -118,7 +118,7 @@ function getWords() {
 // The user has clicked submit to add a word and definition to the index
 // Send the data to the addWord function and send a response if successful
 app.put("/words", function(request, response) {
-    addWord(request.body.word, request.body.defintion).then(function(resp) {
+    addWord(request.body.word, request.body.definition).then(function(resp) {
         response.send(resp);
     }).catch(function(err) {
         console.log(err);
