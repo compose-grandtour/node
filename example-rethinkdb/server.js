@@ -64,7 +64,7 @@ r.connect(options).then(function(conn) {
 }).then(function(result) {
     if (result.tables_created > 0) { console.log("Table created"); }
 }).catch(function(err) {
-    console.err(err);
+    console.error(err);
 });
 
 // Add a word to the database
