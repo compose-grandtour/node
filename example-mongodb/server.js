@@ -45,11 +45,11 @@ if (connectionCertPath) {
 let port = process.env.PORT || 8080;
 
 // This is a global variable we'll use for handing the MongoDB client around
-let mongodb;
+let mygrandtour;
 
 // Add a word to the database (returns a promise)
 function addWord(word, definition) {
-  return mongodb.collection("words").insertOne({
+  return mygrandtour.collection("words").insertOne({
     word: word,
     definition: definition
   });
@@ -57,7 +57,7 @@ function addWord(word, definition) {
 
 // Get words from the database (returns a promise)
 function getWords() {
-  return mongodb
+  return mygrandtour
     .collection("words")
     .find()
     .toArray();
@@ -96,7 +96,7 @@ app.get("/words", function(request, response) {
 // This is the MongoDB connection. Once run, it'll start the
 MongoClient.connect(connectionString, options)
   .then(db => {
-    mongodb = db.db("grand_tour");
+    mygrandtour = db.db("grand_tour");
     app.listen(port, function() {
       console.log("Server is listening on port " + port);
     });
