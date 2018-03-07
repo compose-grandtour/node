@@ -104,7 +104,7 @@ function getWords() {
       }
     })
     .then(results => {
-      return new Promise(function(resolve, reject) {
+      return new Promise((resolve, reject) => {
         let words = [];
         results.hits.hits.forEach(function(hit) {
           words.push({
