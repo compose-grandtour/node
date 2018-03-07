@@ -25,6 +25,7 @@ if (connectionString === undefined) {
   );
   process.exit(1);
 }
+
 let hostList = connectionString.split(",");
 
 let client = new elasticsearch.Client({
@@ -155,6 +156,6 @@ client
     });
   })
   .catch(err => {
-    console.log("Server not responding");
+    console.log("Elasticsearch server not responding");
     process.exit(1);
   });
