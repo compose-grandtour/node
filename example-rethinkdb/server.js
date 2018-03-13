@@ -47,15 +47,17 @@ options.ssl = {
 
 r
   .connect(options)
-  .then(function(conn) {
+  .then((conn) => {
     connection = conn;
   })
   .then(() => {
     return r
       .dbList()
       .contains("grand_tour")
-      .do(function(exists) {
-        return r.branch(exists, { dbs_created: 0 }, r.dbCreate("grand_tour"));
+      .do(function (exists) {
+        return r.branch(exists, {
+          dbs_created: 0
+        }, r.dbCreate("grand_tour"));
       })
       .run(connection);
   })
@@ -69,9 +71,12 @@ r
       .contains("words")
       .do(exists => {
         return r.branch(
-          exists,
-          { tables_created: 0 },
-          r.db("grand_tour").tableCreate("words", { replicas: 3 })
+          exists, {
+            tables_created: 0
+          },
+          r.db("grand_tour").tableCreate("words", {
+            replicas: 3
+          })
         );
       })
       .run(connection);
@@ -116,12 +121,12 @@ app.use(express.static(__dirname + "/public"));
 
 // The user has clicked submit to add a word and definition to the database
 // Send the data to the addWord function and send a response if successful
-app.put("/words", function(request, response) {
+app.put("/words", (request, response) => {
   addWord(request.body.word, request.body.definition)
-    .then(function(resp) {
+    .then((resp) => {
       response.status(200).send(resp);
     })
-    .catch(function(err) {
+    .catch((err) => {
       console.log(err);
       response.status(500).send(err);
     });
@@ -129,18 +134,18 @@ app.put("/words", function(request, response) {
 
 // Read from the database when the page is loaded or after a word is successfully added
 // Use the getWords function to get a list of words and definitions from the database
-app.get("/words", function(request, response) {
+app.get("/words", (request, response) => {
   getWords()
-    .then(function(words) {
+    .then((words) => {
       response.send(words);
     })
-    .catch(function(err) {
+    .catch((err) => {
       console.log(err);
       response.status(500).send(err);
     });
 });
 
 // Listen for a connection.
-app.listen(port, function() {
+app.listen(port, () => {
   console.log("Server is listening on port " + port);
 });
