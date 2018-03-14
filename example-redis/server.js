@@ -43,14 +43,13 @@ if (connectionString.startsWith("rediss://")) {
   client = redis.createClient(connectionString);
 }
 
-client.on("error", (err) => {
+client.on("error", err => {
   console.log("Error " + err);
 });
 
 // Add a word to the database
 function addWord(word, definition) {
-  return new Promise(function(resolve, reject) {
-    // use the connection to add the word and definition entered by the user
+  return new Promise((resolve, reject) => {
     client.hset("words", word, definition, (error, result) => {
       if (error) {
         reject(error);
@@ -63,8 +62,7 @@ function addWord(word, definition) {
 
 // Get words from the database
 function getWords() {
-  return new Promise(function(resolve, reject) {
-    // use the connection to return us all the documents in the words hash.
+  return new Promise((resolve, reject) => {
     client.hgetall("words", (err, resp) => {
       if (err) {
         reject(err);
@@ -82,10 +80,10 @@ app.use(express.static(__dirname + "/public"));
 // Send the data to the addWord function and send a response if successful
 app.put("/words", (request, response) => {
   addWord(request.body.word, request.body.definition)
-    .then((resp) => {
+    .then(resp => {
       response.send(resp);
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       response.status(500).send(err);
     });
@@ -95,16 +93,16 @@ app.put("/words", (request, response) => {
 // Use the getWords function to get a list of words and definitions from the hash
 app.get("/words", (request, response) => {
   getWords()
-    .then((words) => {
+    .then(words => {
       response.send(words);
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       response.status(500).send(err);
     });
 });
 
 // Listen for a connection.
-app.listen(port, () =>  {
+app.listen(port, () => {
   console.log("Server is listening on port " + port);
 });
