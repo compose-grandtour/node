@@ -2,4 +2,4 @@
 /example-mongodb/composecert.pem
 /example-rethinkdb/composecert.pem
 /example-postgresql/composecert.pem
-
+example-redis-ioredis/.vscode/launch.json
