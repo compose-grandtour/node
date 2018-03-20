@@ -50,79 +50,69 @@ let routingKey = "words";
 let exchangeName = "grandtour";
 let qName = "sample";
 
-amqp
-  .connect(connectionString, { servername: parsedurl.hostname })
+var open = amqp.connect(connectionString, { servername: parsedurl.hostname });
+
+open
   .then(conn => {
-    return conn.createChannel().then(ch => {
-      ch
-        .assertExchange(exchangeName, "direct", { durable: true })
-        .then(() => {
-          return ch.assertQueue(qName, { exclusive: false });
-        })
-        .then(q => {
-          return ch.bindQueue(q.queue, exchangeName, routingKey);
-        })
-        .finally(() => {
-          conn.close();
-        });
-    });
+    return conn.createChannel();
+  })
+  .then(ch => {
+    return ch
+      .assertExchange(exchangeName, "direct", { durable: true })
+      .then(() => {
+        return ch.assertQueue(qName, { exclusive: false });
+      })
+      .then(q => {
+        return ch.bindQueue(q.queue, exchangeName, routingKey);
+      });
   })
   .catch(err => {
     console.err(err);
     process.exit(1);
   });
 
-// Add a message to the queue
+// Publish a message to the exchange
+// RabbitMQ will move it to the queue
 function addMessage(message) {
-  return amqp
-    .connect(connectionString, { servername: parsedurl.hostname })
+  return open
     .then(conn => {
-      return conn
-        .createChannel()
-        .then(channel => {
-          channel.publish(exchangeName, routingKey, new Buffer(message));
-          let msgTxt = message + " : Message sent at " + new Date();
-          console.log(" [+] %s", msgTxt);
-          return new Promise(resolve => {
-            resolve(message);
-          });
-        })
-        .finally(() => {
-          conn.close();
-        });
+      return conn.createChannel();
     })
-    .catch(err => {
-      console.log(err);
-      process.exit(1);
+    .then(ch => {
+      ch.publish(exchangeName, routingKey, new Buffer(message));
+      let msgTxt = message + " : Message sent at " + new Date();
+      console.log(" [+] %s", msgTxt);
+      return new Promise(resolve => {
+        resolve(message);
+      });
     });
 }
 
 // Get a message from the queue
 function getMessage() {
-  return amqp
-    .connect(connectionString, { servername: parsedurl.hostname })
+  return open
     .then(conn => {
-      return conn.createChannel().then(channel => {
-        // ...and get a message from the queue, which is bound to the exchange
-        return channel.get(qName, {}).then(msgOrFalse => {
-          if (msgOrFalse !== false) {
-            return new Promise((resolve, reject) => {
-              let result =
-                msgOrFalse.content.toString() +
-                " : Message received at " +
-                new Date();
-              console.log(" [-] %s", result);
-              channel.ack(msgOrFalse);
-              resolve(result);
-            });
-          } else {
-            let result = "No messages in the queue";
+      return conn.createChannel();
+    })
+    .then(ch => {
+      return ch.get(qName, {}).then(msgOrFalse => {
+        if (msgOrFalse !== false) {
+          return new Promise((resolve, reject) => {
+            let result =
+              msgOrFalse.content.toString() +
+              " : Message received at " +
+              new Date();
             console.log(" [-] %s", result);
-            return new Promise(resolve => {
-              resolve(result);
-            });
-          }
-        });
+            ch.ack(msgOrFalse);
+            resolve(result);
+          });
+        } else {
+          let result = "No messages in the queue";
+          console.log(" [-] %s", result);
+          return new Promise(resolve => {
+            resolve(result);
+          });
+        }
       });
     });
 }
@@ -136,7 +126,6 @@ app.use(express.static(__dirname + "/public"));
 app.put("/message", function(request, response) {
   addMessage(request.body.message)
     .then(resp => {
-      console.log(resp);
       response.send(resp);
     })
     .catch(err => {
