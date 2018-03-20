@@ -14,9 +14,6 @@ app.use(
   })
 );
 
-// Util is handy to have around, so thats why that's here.
-const util = require("util");
-
 // We want to extract the port to publish our app on
 let port = process.env.PORT || 8080;
 
