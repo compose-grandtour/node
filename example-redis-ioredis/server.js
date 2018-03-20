@@ -30,14 +30,14 @@ if (connectionString === undefined) {
 }
 
 let url = new URL(connectionString);
-let options = { host: url.hostname, port: url.port, password: url.password };
+let options = { };
 
 if (url.protocol === "rediss:") {
   // If this is a rediss: connection, we have to add TLS and server
-  options.tls = { servername: new URL(connectionString).hostname };
+  options.tls = { servername: url.hostname };
 }
 
-let redis = new Redis(options);
+let redis = new Redis(connectionString, options );
 
 // Add a word to the database
 function addWord(word, definition) {

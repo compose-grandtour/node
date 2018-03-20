@@ -102,7 +102,13 @@ app.get("/words", (request, response) => {
     });
 });
 
-// Listen for a connection.
-app.listen(port, () => {
-  console.log("Server is listening on port " + port);
+client.ping((err, reply) => {
+  if (err !== null) {
+    console.log(err);
+    process.exit(1);
+  }
+  // Listen for a connection.
+  app.listen(port, () => {
+    console.log("Server is listening on port " + port);
+  });
 });
