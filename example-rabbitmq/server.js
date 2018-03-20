@@ -33,8 +33,6 @@ if (connectionString === undefined) {
 
 let parsedurl = url.parse(connectionString);
 
-// Bind a queue to the exchange to listen for messages
-// When we publish a message, it will be sent to this queue, via the exchange
 let routingKey = "words";
 let exchangeName = "grandtour";
 let qName = "sample";
@@ -46,6 +44,8 @@ open
     return conn.createChannel();
   })
   .then(ch => {
+    // Bind a queue to the exchange to listen for messages
+    // When we publish a message, it will be sent to this queue, via the exchange
     return ch
       .assertExchange(exchangeName, "direct", { durable: true })
       .then(() => {
@@ -86,7 +86,7 @@ function getMessage() {
     .then(ch => {
       return ch.get(qName, {}).then(msgOrFalse => {
         if (msgOrFalse !== false) {
-          return new Promise((resolve, reject) => {
+          return new Promise(resolve => {
             let result =
               msgOrFalse.content.toString() +
               " : Message received at " +
