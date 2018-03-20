@@ -86,18 +86,18 @@ function getMessage() {
     .then(ch => {
       return ch.get(qName, {}).then(msgOrFalse => {
         return new Promise(resolve => {
-            let result="No messages in queue";
-            if(msgOrFalse!==false) {
-            result=msgOrFalse.content.toString() +
-            " : Message received at " +
-            new Date();
+          let result = "No messages in queue";
+          if (msgOrFalse !== false) {
+            result =
+              msgOrFalse.content.toString() +
+              " : Message received at " +
+              new Date();
             ch.ack(msgOrFalse);
-            }
-                console.log(" [-] %s", result);
-                resolve(result);
-
+          }
+          console.log(" [-] %s", result);
+          resolve(result);
         });
-        });
+      });
     });
 }
 
