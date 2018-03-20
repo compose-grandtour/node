@@ -21,14 +21,6 @@ let port = process.env.PORT || 8080;
 // Rabbitmq uses AMQP as a protocol, so this is a generic library for the protocol
 const amqp = require("amqplib");
 
-function bail(err, conn) {
-  console.error(err);
-  if (conn)
-    conn.close(function() {
-      process.exit(1);
-    });
-}
-
 // Connect using a connection string
 // Create a user, then get your connection string from the Compose deployment overview page
 // Add your connection string as an environment variable and access it here
