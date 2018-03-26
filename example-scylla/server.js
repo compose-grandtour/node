@@ -67,33 +67,17 @@ let client = new cassandra.Client({
 
 // Add a word to the database
 function addWord(word, definition) {
-    return new Promise(function(resolve, reject) {
-        client.execute(
-            "INSERT INTO grand_tour.words(my_table_id, word, definition) VALUES(?,?,?)", [uuid.v4(), word, definition], { prepare: true },
-            function(error, result) {
-                if (error) {
-                    console.log(error);
-                    reject(error);
-                } else {
-                    resolve(result.rows);
-                }
-            }
-        );
-    });
+    return client.execute(
+        "INSERT INTO grand_tour.words(my_table_id, word, definition) VALUES(?,?,?)", [uuid.v4(), word, definition], {
+            prepare: true
+        });
 }
 
 // Get words from the database
 function getWords() {
-    return new Promise(function(resolve, reject) {
-        // execute a query on our database
-        client.execute("SELECT * FROM grand_tour.words", function(err, result) {
-            if (err) {
-                console.log(err);
-                reject(err);
-            } else {
-                //console.log(result.rows);
-                resolve(result.rows);
-            }
+    return client.execute("SELECT * FROM grand_tour.words").then(result => {
+        return new Promise((resolve, reject) => {
+            resolve(result.rows);
         });
     });
 }
@@ -103,12 +87,12 @@ app.use(express.static(__dirname + "/public"));
 
 // The user has clicked submit to add a word and definition to the database
 // Send the data to the addWord function and send a response if successful
-app.put("/words", function(request, response) {
+app.put("/words", function (request, response) {
     addWord(request.body.word, request.body.definition)
-        .then(function(resp) {
-            response.send(resp);
+        .then(function (resp) {
+            response.status(200).send(resp);
         })
-        .catch(function(err) {
+        .catch(function (err) {
             console.log(err);
             response.status(500).send(err);
         });
@@ -116,12 +100,12 @@ app.put("/words", function(request, response) {
 
 // Read from the database when the page is loaded or after a word is successfully added
 // Use the getWords function to get a list of words and definitions from the database
-app.get("/words", function(request, response) {
+app.get("/words", function (request, response) {
     getWords()
-        .then(function(words) {
+        .then((words) => {
             response.send(words);
         })
-        .catch(function(err) {
+        .catch(function (err) {
             console.log(err);
             response.status(500).send(err);
         });
@@ -134,18 +118,17 @@ client
     .execute(
         "CREATE KEYSPACE IF NOT EXISTS grand_tour WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '3' };"
     )
-    .then(result =>
-        client
-        .execute(
-            "CREATE TABLE IF NOT EXISTS grand_tour.words (my_table_id uuid, word text, definition text, PRIMARY KEY(my_table_id));"
-        )
-        .then(result => {
-            app.listen(port, function() {
-                console.log("Server is listening on port " + port);
-            });
-        })
-        .catch(err => {
-            console.log(err);
-            process.exit(1);
-        })
-    );
+    .then(result => {
+        return client
+            .execute(
+                "CREATE TABLE IF NOT EXISTS grand_tour.words (my_table_id uuid, word text, definition text, PRIMARY KEY(my_table_id));"
+            );
+    }).then(result => {
+        app.listen(port, function () {
+            console.log("Server is listening on port " + port);
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        process.exit(1);
+    });
