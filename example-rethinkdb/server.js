@@ -20,8 +20,8 @@ let port = process.env.PORT || 8080;
 // Then we'll pull in the database client library
 const r = require("rethinkdb");
 
-// We need to parse the connection string for the deployment
-let parseRethinkdbUrl = require("parse-rethinkdb-url");
+// and we'll need to parse the connection string for the deployment
+const parseRethinkdbUrl = require("parse-rethinkdb-url");
 
 // you can get your connection string from the deployment overview page
 let connectionString = process.env.COMPOSE_RETHINKDB_URL;
@@ -32,63 +32,14 @@ if (connectionString === undefined) {
 }
 
 let options = parseRethinkdbUrl(connectionString);
-let connection;
 
-// Make the database connection using the parsed options
-// and the SSL certificate, and create the 'examples' database.
 // The SSL certificate is available from the deployment overview page
-// If the database already exists RethinkDB returns an error, which will appear in the console
 let caCert = fs.readFileSync(process.env.PATH_TO_RETHINKDB_CERT);
 
-// Now we can insert the SSL credentials
+// Now we can insert the SSL credentials into the options
 options.ssl = {
   ca: caCert
 };
-
-r
-  .connect(options)
-  .then((conn) => {
-    connection = conn;
-  })
-  .then(() => {
-    return r
-      .dbList()
-      .contains("grand_tour")
-      .do(function (exists) {
-        return r.branch(exists, {
-          dbs_created: 0
-        }, r.dbCreate("grand_tour"));
-      })
-      .run(connection);
-  })
-  .then(result => {
-    if (result.dbs_created > 0) {
-      console.log("DB created");
-    }
-    return r
-      .db("grand_tour")
-      .tableList()
-      .contains("words")
-      .do(exists => {
-        return r.branch(
-          exists, {
-            tables_created: 0
-          },
-          r.db("grand_tour").tableCreate("words", {
-            replicas: 3
-          })
-        );
-      })
-      .run(connection);
-  })
-  .then(result => {
-    if (result.tables_created > 0) {
-      console.log("Table created");
-    }
-  })
-  .catch(err => {
-    console.error(err);
-  });
 
 // Add a word to the database
 function addWord(word, definition) {
@@ -110,7 +61,6 @@ function getWords() {
     .orderBy("word")
     .run(connection)
     .then(cursor => {
-      // then we convert the response to an array and send it back to 'main.js'
       return cursor.toArray();
     });
 }
@@ -123,10 +73,10 @@ app.use(express.static(__dirname + "/public"));
 // Send the data to the addWord function and send a response if successful
 app.put("/words", (request, response) => {
   addWord(request.body.word, request.body.definition)
-    .then((resp) => {
+    .then(resp => {
       response.status(200).send(resp);
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       response.status(500).send(err);
     });
@@ -136,16 +86,71 @@ app.put("/words", (request, response) => {
 // Use the getWords function to get a list of words and definitions from the database
 app.get("/words", (request, response) => {
   getWords()
-    .then((words) => {
+    .then(words => {
       response.send(words);
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       response.status(500).send(err);
     });
 });
 
-// Listen for a connection.
-app.listen(port, () => {
-  console.log("Server is listening on port " + port);
-});
+let connection;
+
+// Make the database connection using the parsed options
+// and the SSL certificate, and create the 'grand_tour' database and the `words` table
+// if needed. Once done, start the web server.
+
+r
+  .connect(options)
+  .then(conn => {
+    connection = conn;
+  })
+  .then(() => {
+    return r
+      .dbList()
+      .contains("grand_tour")
+      .do(function(exists) {
+        return r.branch(
+          exists,
+          {
+            dbs_created: 0
+          },
+          r.dbCreate("grand_tour")
+        );
+      })
+      .run(connection);
+  })
+  .then(result => {
+    if (result.dbs_created > 0) {
+      console.log("DB created");
+    }
+    return r
+      .db("grand_tour")
+      .tableList()
+      .contains("words")
+      .do(exists => {
+        return r.branch(
+          exists,
+          {
+            tables_created: 0
+          },
+          r.db("grand_tour").tableCreate("words", {
+            replicas: 3
+          })
+        );
+      })
+      .run(connection);
+  })
+  .then(result => {
+    if (result.tables_created > 0) {
+      console.log("Table created");
+    }
+    // Listen for a connection.
+    app.listen(port, () => {
+      console.log("Server is listening on port " + port);
+    });
+  })
+  .catch(err => {
+    console.error(err);
+  });
