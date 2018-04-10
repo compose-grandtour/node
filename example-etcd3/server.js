@@ -91,11 +91,7 @@ app.get("/words", function(request, response) {
     });
 });
 
-etcd.lease(1).then((l) =>
-    {
-        // Listen for a connection.
-        app.listen(port, function() {
-        console.log("Server is listening on port " + port);
-    });
-}
-);
+// Listen for a connection.
+app.listen(port, function() {
+  console.log("Server is listening on port " + port);
+});
