@@ -8,7 +8,7 @@
     "express": "^4.15.4",
     "http-post": "^0.1.1",
     "http-proxy": "^1.8.1",
-    "mysql": "^2.14.1"
+    "mysql2": "^1.5.3"
   },
   "main": "server.js",
   "scripts": {
