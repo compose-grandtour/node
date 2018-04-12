@@ -54,14 +54,12 @@ if (connectionCertPath) {
 // set up a new connection using our config details
 let connection = null;
 
-
-
 // We can now set up our web server. First up we set it to serve static pages
 app.use(express.static(__dirname + "/public"));
 
 // Add a word to the database
 function addWord(word, definition) {
-  return connection.query("INSERT INTO words(word,definition) VALUES(?, ?)", [
+  return connection.query("INSERT INTO words( word, definition) VALUES(?, ?)", [
     word,
     definition
   ]);
@@ -104,18 +102,21 @@ app.get("/words", function(request, response) {
     });
 });
 
-mysql.createConnection(options).then(conn => {
-  conn
-    .query(
+mysql
+  .createConnection(options)
+  .then(conn => {
+    connection = conn;
+    return connection.query(
       "CREATE TABLE IF NOT EXISTS words (id int auto_increment primary key, word varchar(256) NOT NULL, definition varchar(256) NOT NULL)"
-    )
-    .then(result => {
-      // Listen for a connection.
-      app.listen(port, function() {
-        console.log("Server is listening on port " + port);
-      }); 
+    );
+  })
+  .then(result => {
+    // Listen for a connection.
+    app.listen(port, function() {
+      console.log("Server is listening on port " + port);
     });
-  connection = conn;
-}).catch((err) => { console.log(err);
-  process.exit(1);
-});
+  })
+  .catch(err => {
+    console.log(err);
+    process.exit(1);
+  });
