@@ -4,7 +4,7 @@
     "description": "Elasticsearch Node.js connection example, part of the Compose grand tour",
     "dependencies": {
         "body-parser": "^1.17.2",
-        "elasticsearch": "^13.3.1",
+        "elasticsearch": "^15.1.1",
         "express": "^4.15.4",
         "http-post": "^0.1.1",
         "http-proxy": "^1.8.1"
@@ -21,10 +21,12 @@
         "url": "https://github.com/compose-grandtour/node.git"
     },
     "author": "Compose",
-    "contributors": [{
-        "name": "Neil Dewhurst",
-        "email": "neil@compose.io"
-    }],
+    "contributors": [
+        {
+            "name": "Neil Dewhurst",
+            "email": "neil@compose.io"
+        }
+    ],
     "bugs": {
         "url": "https://github.com/compose-grandtour/node/issues"
     },
