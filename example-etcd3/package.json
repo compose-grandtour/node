@@ -3,11 +3,11 @@
   "description": "Etcd3 Node.js connection example, part of the Compose grand tour",
   "version": "1.0.0",
   "dependencies": {
-    "body-parser": "^1.17.2",
-    "etcd3": "^0.2.6",
-    "express": "^4.15.4",
+    "body-parser": "^1.18.3",
+    "etcd3": "^0.2.11",
+    "express": "^4.16.3",
     "http-post": "^0.1.1",
-    "http-proxy": "^1.8.1"
+    "http-proxy": "^1.17.0"
   },
   "main": "server.js",
   "scripts": {
