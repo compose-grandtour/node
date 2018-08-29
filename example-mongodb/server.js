@@ -27,17 +27,22 @@ if (connectionString === undefined) {
   process.exit(1);
 }
 
-// Setting nothing in the options will assume no SSL
 let options = {};
 
-// If the path to the certificate is set, we assume SSL.
-// Therefore we read the cert and set the options for a validated SSL connection
+// If the path to the certificate is set, we assume SSL with a selfsigned cert
+// Therefore we read the cert and set the options for a selfsigned SSL connection
 if (connectionCertPath) {
   var ca = [fs.readFileSync(connectionCertPath)];
   options = {
     ssl: true,
     sslValidate: true,
     sslCA: ca
+  };
+} else {
+  // Otherwise we ass
+  options = {
+    ssl: true,
+    sslValidate: true,
   };
 }
 
