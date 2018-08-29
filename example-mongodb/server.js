@@ -39,7 +39,7 @@ if (connectionCertPath) {
     sslCA: ca
   };
 } else {
-  // Otherwise we ass
+  // Otherwise we assume it's SSL with a Let's Encrypt certificate
   options = {
     ssl: true,
     sslValidate: true,
